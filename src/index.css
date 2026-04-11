@@ -29,6 +29,7 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  height: 100dvh;
   box-sizing: border-box;
   background-color: var(--bg-color);
   color: var(--text-primary);
