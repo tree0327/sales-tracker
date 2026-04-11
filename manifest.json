@@ -3,13 +3,13 @@
   "name": "매출관리 (모바일 최적화)",
   "icons": [
     {
-      "src": "favicon.jpg",
-      "type": "image/jpeg",
+      "src": "favicon.png",
+      "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "favicon.jpg",
-      "type": "image/jpeg",
+      "src": "favicon.png",
+      "type": "image/png",
       "sizes": "512x512"
     }
   ],
