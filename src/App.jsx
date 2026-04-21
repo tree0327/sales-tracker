@@ -21,15 +21,20 @@ function App() {
     viewType: 'current' // 'current' or 'all'
   });
 
-  // Calculate current month total
+  // Calculate current month totals
   const period = getSalesPeriod();
-  const currentTotal = salesData.reduce((sum, item) => {
+  const currentData = salesData.filter(item => {
     const itemDate = new Date(item.date);
-    if (itemDate >= period.start && itemDate <= period.end) {
-      return sum + item.final;
-    }
-    return sum;
-  }, 0);
+    return itemDate >= period.start && itemDate <= period.end;
+  });
+
+  const currentTotal = currentData.reduce((sum, item) => sum + item.final, 0);
+  const currentCashTotal = currentData.filter(i => i.type === '현금').reduce((sum, i) => sum + i.final, 0);
+  const currentCardTotal = currentData.filter(i => i.type === '카드').reduce((sum, i) => sum + i.final, 0);
+
+  const formatPeriodDate = (date) => {
+    return `${date.getMonth() + 1}/${date.getDate()}`;
+  };
 
   // Handlers for Input Modal
   const openInputModal = (type, isEdit = false, id = null, initialData = null) => {
@@ -77,14 +82,19 @@ function App() {
           className="sq-btn cash-btn" 
           onClick={() => openInputModal('현금')}
         >
-          <div className="btn-icon">💵</div>
+          <div className="btn-icon">&#xFFE6;</div>
           <span>현금</span>
         </button>
         <button 
           className="sq-btn card-btn" 
           onClick={() => openInputModal('카드')}
         >
-          <div className="btn-icon">💳</div>
+          <div className="btn-icon-svg">
+            <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+              <line x1="1" y1="10" x2="23" y2="10"/>
+            </svg>
+          </div>
           <span>카드</span>
         </button>
       </div>
@@ -93,10 +103,16 @@ function App() {
         className="bottom-bar glass" 
         onClick={() => openRecordModal('current')}
       >
+        <span className="period-range">{formatPeriodDate(period.start)} ~ {formatPeriodDate(period.end)}</span>
         <span className="total-label">이번 달 누적 매출</span>
         <div className="total-amount-wrap">
           <span className="total-amount">{currentTotal.toLocaleString()}</span>
           <span className="total-unit">원</span>
+        </div>
+        <div className="sub-totals">
+          <span className="sub-total-item cash-sub">현금 {currentCashTotal.toLocaleString()}원</span>
+          <span className="sub-total-divider">|</span>
+          <span className="sub-total-item card-sub">카드 {currentCardTotal.toLocaleString()}원</span>
         </div>
         <span className="click-hint">터치해서 기록 확인 및 수정</span>
       </div>

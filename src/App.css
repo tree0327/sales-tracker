@@ -60,6 +60,19 @@
 
 .btn-icon {
   font-size: 45px;
+  line-height: 1;
+}
+
+.btn-icon-svg {
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-icon-svg svg {
+  color: white;
 }
 
 .cash-btn {
@@ -71,7 +84,7 @@
 }
 
 .bottom-bar {
-  padding: 35px 20px;
+  padding: 28px 20px;
   border-radius: var(--border-radius-lg);
   text-align: center;
   box-shadow: var(--shadow-sm);
@@ -85,11 +98,19 @@
   background-color: rgba(0, 0, 0, 0.02);
 }
 
+.period-range {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  display: block;
+  margin-bottom: 4px;
+}
+
 .total-label {
   font-size: 16px;
   color: var(--text-secondary);
   font-weight: 700;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   display: block;
 }
 
@@ -113,10 +134,37 @@
   color: var(--text-primary);
 }
 
+.sub-totals {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.sub-total-item {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.cash-sub {
+  color: var(--success);
+}
+
+.card-sub {
+  color: var(--primary);
+}
+
+.sub-total-divider {
+  color: var(--text-secondary);
+  font-size: 12px;
+  opacity: 0.5;
+}
+
 .click-hint {
   font-size: 14px;
   color: var(--text-secondary);
-  margin-top: 12px;
+  margin-top: 10px;
   display: block;
   font-weight: 500;
 }

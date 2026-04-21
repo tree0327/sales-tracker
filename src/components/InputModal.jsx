@@ -4,22 +4,32 @@ import './InputModal.css';
 
 export default function InputModal({ isOpen, onClose, onSave, initialType, initialData }) {
   const [amount, setAmount] = useState('');
+  const [displayAmount, setDisplayAmount] = useState('');
   const [name, setName] = useState('');
   const { showAlert } = useModal();
 
   useEffect(() => {
     if (isOpen) {
       if (initialData) {
-        setAmount(initialData.original || '');
+        const val = String(initialData.original || '');
+        setAmount(val);
+        setDisplayAmount(val ? Number(val).toLocaleString() : '');
         setName(initialData.name || '');
       } else {
         setAmount('');
+        setDisplayAmount('');
         setName('');
       }
     }
   }, [isOpen, initialData]);
 
   if (!isOpen) return null;
+
+  const handleAmountChange = (e) => {
+    const raw = e.target.value.replace(/,/g, '').replace(/[^0-9]/g, '');
+    setAmount(raw);
+    setDisplayAmount(raw ? Number(raw).toLocaleString() : '');
+  };
 
   const handleSave = () => {
     if (!amount) {
@@ -50,14 +60,18 @@ export default function InputModal({ isOpen, onClose, onSave, initialType, initi
         <div className="input-group">
           <label>금액 (필수)</label>
           <input 
-            type="number" 
-            inputMode="numeric" 
-            pattern="[0-9]*" 
+            type="text"
+            inputMode="numeric"
             placeholder="0" 
-            value={amount} 
-            onChange={(e) => setAmount(e.target.value)} 
+            value={displayAmount} 
+            onChange={handleAmountChange} 
             autoFocus
           />
+          {initialType === '카드' && amount && (
+            <div className="fee-notice">
+              수수료 10% 차감 후: <strong>{Math.floor(Number(amount) * 0.9).toLocaleString()}원</strong>
+            </div>
+          )}
         </div>
 
         <div className="btn-group">

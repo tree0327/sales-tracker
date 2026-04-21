@@ -145,6 +145,32 @@ button:active {
   font-weight: 600;
 }
 
+/* Confirm Modal Buttons */
+.confirm-btn-group {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-confirm-cancel {
+  flex: 1;
+  padding: 14px;
+  background-color: #e5e5ea;
+  color: #1c1c1e;
+  border-radius: var(--border-radius-sm);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.btn-confirm-ok {
+  flex: 1;
+  padding: 14px;
+  background-color: var(--danger);
+  color: white;
+  border-radius: var(--border-radius-sm);
+  font-size: 16px;
+  font-weight: 600;
+}
+
 /* Utility UI Classes */
 .btn-primary { background: linear-gradient(135deg, var(--primary), #0056b3); color: white; }
 .btn-success { background: linear-gradient(135deg, var(--success), #28a745); color: white; }

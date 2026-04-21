@@ -13,7 +13,6 @@
   overflow-y: auto;
   margin-bottom: 20px;
   padding-right: 5px;
-  /* Scrollbar styling */
 }
 
 .record-list::-webkit-scrollbar {
@@ -24,18 +23,71 @@
   border-radius: 10px;
 }
 
+/* Empty state */
 .empty-state {
   text-align: center;
   padding: 60px 0;
   color: var(--text-secondary);
   font-weight: 600;
+  font-size: 15px;
 }
 
+.empty-state.small {
+  padding: 30px 0;
+}
+
+.empty-icon {
+  font-size: 28px;
+  margin-bottom: 12px;
+  opacity: 0.4;
+  letter-spacing: 2px;
+  font-weight: 800;
+}
+
+/* Filter buttons */
+.filter-buttons {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 4px;
+  background: var(--input-bg);
+  border-radius: 10px;
+}
+
+.filter-btn {
+  flex: 1;
+  padding: 10px 0;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+
+.filter-btn:active {
+  transform: scale(0.96);
+}
+
+.filter-btn.active {
+  background: white;
+  color: var(--text-primary);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.filter-btn.active.cash-filter {
+  color: var(--success);
+}
+
+.filter-btn.active.card-filter {
+  color: var(--primary);
+}
+
+/* Record items */
 .record-item {
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   padding: 18px 0;
 }
-
 
 .record-item:last-child {
   border-bottom: none;
@@ -83,14 +135,22 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-secondary);
   font-weight: 500;
+  gap: 8px;
+}
+
+.sub-row > span:first-child {
+  flex: 1;
+  min-width: 0;
+  word-break: keep-all;
 }
 
 .action-btns {
   display: flex;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .action-btn {
@@ -111,7 +171,7 @@
 .accordion {
   background-color: var(--input-bg);
   width: 100%;
-  padding: 18px 20px;
+  padding: 16px 18px;
   border-radius: var(--border-radius-sm);
   display: flex;
   justify-content: space-between;
@@ -137,19 +197,47 @@
 }
 
 .period-label {
-  font-size: 15px;
+  font-size: 14px;
   color: var(--text-secondary);
   font-weight: 600;
 }
 
+.accordion-right {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .accordion-total {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 800;
   color: var(--text-primary);
 }
 
+.accordion-sub-totals {
+  display: flex;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  justify-content: flex-end;
+}
+
+.accordion-cash {
+  color: var(--success);
+}
+
+.accordion-card {
+  color: var(--primary);
+}
+
+.accordion-divider {
+  color: var(--text-secondary);
+  opacity: 0.4;
+}
+
 .panel {
-  padding: 0 10px;
+  padding: 12px 10px 0;
   background-color: transparent;
   margin-bottom: 15px;
 }
