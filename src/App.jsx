@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useSalesData } from './hooks/useSalesData';
 import { getSalesPeriod, getPeriodEndDay } from './utils/salesPeriod';
 import { supabase } from './supabaseClient';
-import { useModal } from './context/ModalContext';
+import { useModal } from './context/modal-context';
 import InputModal from './components/InputModal';
 import RecordModal from './components/RecordModal';
 import './App.css';
