@@ -1,5 +1,5 @@
 import { useModal } from '../context/ModalContext';
-import { getPeriodKey } from '../utils/salesPeriod';
+import { getSalesPeriod, getPeriodKey } from '../utils/salesPeriod';
 import { useState } from 'react';
 import './RecordModal.css';
 
@@ -10,23 +10,6 @@ export default function RecordModal({ isOpen, onClose, viewType, salesData, onDe
   const { showConfirm } = useModal();
 
   if (!isOpen) return null;
-
-  const getSalesPeriod = () => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth();
-    const date = now.getDate();
-
-    let start, end;
-    if (date <= 10) {
-      start = new Date(year, month - 1, 11, 0, 0, 0);
-      end = new Date(year, month, 10, 23, 59, 59);
-    } else {
-      start = new Date(year, month, 11, 0, 0, 0);
-      end = new Date(year, month + 1, 10, 23, 59, 59);
-    }
-    return { start, end };
-  };
 
   const period = getSalesPeriod();
 
@@ -99,7 +82,7 @@ export default function RecordModal({ isOpen, onClose, viewType, salesData, onDe
   if (viewType === 'current') {
     const currentData = salesData.filter(item => {
       const dt = new Date(item.date);
-      return dt >= period.start && dt <= period.end;
+      return dt >= period.start && dt < period.end;
     }).sort((a, b) => new Date(b.date) - new Date(a.date));
 
     const filteredData = currentFilter === '전체' ? currentData : currentData.filter(item => item.type === currentFilter);

@@ -25,7 +25,7 @@ function App() {
   const period = getSalesPeriod();
   const currentData = salesData.filter(item => {
     const itemDate = new Date(item.date);
-    return itemDate >= period.start && itemDate <= period.end;
+    return itemDate >= period.start && itemDate < period.end;
   });
 
   const currentTotal = currentData.reduce((sum, item) => sum + item.final, 0);
