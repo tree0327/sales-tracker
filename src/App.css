@@ -200,3 +200,22 @@
   display: block;
   font-weight: 500;
 }
+
+.status-banner {
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  text-align: center;
+}
+.status-banner.error {
+  background: #fef2f2;
+  color: #ef4444;
+  border: 1px solid #fecaca;
+}
+.status-banner.info {
+  background: #eff6ff;
+  color: var(--primary);
+  border: 1px solid #bfdbfe;
+}

@@ -8,7 +8,7 @@ import RecordModal from './components/RecordModal';
 import './App.css';
 
 function App() {
-  const { salesData, addRecord, updateRecord, deleteRecord, backupLocalToDb } =
+  const { salesData, addRecord, updateRecord, deleteRecord, backupLocalToDb, loading, error } =
     useSalesData();
   const { showAlert } = useModal();
   const [backingUp, setBackingUp] = useState(false);
@@ -91,6 +91,8 @@ function App() {
 
   return (
     <div className="app-container">
+      {error && <div className="status-banner error">저장 중 문제가 발생했습니다: {error}</div>}
+      {loading && <div className="status-banner info">동기화 중…</div>}
       <div className="top-bar">
         <h1 className="title">매출 관리</h1>
         <div className="top-actions">
