@@ -1,8 +1,4 @@
 import { useMemo, useState } from 'react';
-import {
-  BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
-  XAxis, YAxis, Tooltip, ResponsiveContainer,
-} from 'recharts';
 import { useSalesData } from '../hooks/useSalesData';
 import { supabase } from '../supabaseClient';
 import {
@@ -14,6 +10,28 @@ import './AdminDashboard.css';
 
 const won = (n) => `${(Number(n) || 0).toLocaleString()}원`;
 const GOAL_KEY = 'admin_monthly_goal';
+
+// 의존성 없는 순수 CSS 막대 차트.
+// data: [{ label, value }]
+function BarChartLite({ data, color = '#007aff', unit = '원' }) {
+  const max = Math.max(1, ...data.map((d) => d.value));
+  return (
+    <div className="barchart">
+      {data.map((d, i) => (
+        <div className="barchart-col" key={i}>
+          <div className="barchart-track">
+            <div
+              className="barchart-bar"
+              style={{ height: `${(d.value / max) * 100}%`, background: color }}
+              title={`${d.label}: ${d.value.toLocaleString()}${unit}`}
+            />
+          </div>
+          <span className="barchart-label">{d.label}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function AdminDashboard() {
   const { salesData, loading } = useSalesData();
@@ -64,7 +82,14 @@ export default function AdminDashboard() {
     return <div className="app-container"><p className="empty">불러오는 중...</p></div>;
   }
 
-  const PIE = ['#34c759', '#007aff'];
+  // 차트용 데이터 변환
+  const trendData = trend.map((t) => ({ label: t.ym.slice(5), value: t.total }));
+  const dailyData = daily.map((d) => ({ label: String(d.day), value: d.total }));
+  const weekdayData = weekday.map((w) => ({ label: w.weekday, value: w.total }));
+  const hourData = hours
+    .filter((h) => h.total > 0)
+    .map((h) => ({ label: `${h.hour}시`, value: h.total }));
+  const ratioTotal = ratio.cash + ratio.card || 1;
 
   return (
     <div className="admin">
@@ -102,50 +127,22 @@ export default function AdminDashboard() {
 
       <div className="admin-section">
         <h2>월별 매출 추이</h2>
-        <ResponsiveContainer width="100%" height={220}>
-          <BarChart data={trend}>
-            <XAxis dataKey="ym" tick={{ fontSize: 11 }} />
-            <YAxis tick={{ fontSize: 11 }} width={50} />
-            <Tooltip formatter={(v) => won(v)} />
-            <Bar dataKey="total" fill="#007aff" radius={[6, 6, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+        <BarChartLite data={trendData} color="#007aff" />
       </div>
 
       <div className="admin-section">
         <h2>이번 달 일별 매출</h2>
-        <ResponsiveContainer width="100%" height={200}>
-          <LineChart data={daily}>
-            <XAxis dataKey="day" tick={{ fontSize: 10 }} />
-            <YAxis tick={{ fontSize: 11 }} width={50} />
-            <Tooltip formatter={(v) => won(v)} />
-            <Line type="monotone" dataKey="total" stroke="#34c759" strokeWidth={2} dot={false} />
-          </LineChart>
-        </ResponsiveContainer>
+        <BarChartLite data={dailyData} color="#34c759" />
       </div>
 
       <div className="admin-section">
         <h2>요일별 패턴</h2>
-        <ResponsiveContainer width="100%" height={200}>
-          <BarChart data={weekday}>
-            <XAxis dataKey="weekday" tick={{ fontSize: 12 }} />
-            <YAxis tick={{ fontSize: 11 }} width={50} />
-            <Tooltip formatter={(v) => won(v)} />
-            <Bar dataKey="total" fill="#5856d6" radius={[6, 6, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+        <BarChartLite data={weekdayData} color="#5856d6" />
       </div>
 
       <div className="admin-section">
         <h2>시간대별 패턴</h2>
-        <ResponsiveContainer width="100%" height={200}>
-          <BarChart data={hours}>
-            <XAxis dataKey="hour" tick={{ fontSize: 10 }} />
-            <YAxis tick={{ fontSize: 11 }} width={50} />
-            <Tooltip formatter={(v) => won(v)} />
-            <Bar dataKey="total" fill="#ff9500" radius={[4, 4, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+        {hourData.length ? <BarChartLite data={hourData} color="#ff9500" /> : <p className="muted">데이터 없음</p>}
       </div>
 
       <div className="admin-section">
@@ -159,16 +156,14 @@ export default function AdminDashboard() {
 
       <div className="admin-section">
         <h2>현금/카드 비율 (이번 달)</h2>
-        <ResponsiveContainer width="100%" height={200}>
-          <PieChart>
-            <Pie data={[{ name: '현금', value: ratio.cash }, { name: '카드', value: ratio.card }]}
-                 dataKey="value" nameKey="name" outerRadius={70} label>
-              {PIE.map((c, i) => <Cell key={i} fill={c} />)}
-            </Pie>
-            <Tooltip formatter={(v) => won(v)} />
-          </PieChart>
-        </ResponsiveContainer>
-        <p className="muted">현금 {ratio.cashPct}% · 카드 {ratio.cardPct}%</p>
+        <div className="ratio-bar">
+          <div className="ratio-cash" style={{ width: `${(ratio.cash / ratioTotal) * 100}%` }} />
+          <div className="ratio-card" style={{ width: `${(ratio.card / ratioTotal) * 100}%` }} />
+        </div>
+        <div className="compare-row">
+          <div><span>현금 {ratio.cashPct}%</span><strong>{won(ratio.cash)}</strong></div>
+          <div><span>카드 {ratio.cardPct}%</span><strong>{won(ratio.card)}</strong></div>
+        </div>
       </div>
 
       <div className="admin-section">
@@ -183,8 +178,8 @@ export default function AdminDashboard() {
       <div className="admin-section">
         <h2>최고 거래 TOP 5</h2>
         <ul className="rank-list">
-          {top5.map((r, i) => (
-            <li key={r.id}><span>{i + 1}. {r.name || r.type}</span><strong>{won(r.final)}</strong></li>
+          {top5.map((r) => (
+            <li key={r.id}><span>{r.name || r.type}</span><strong>{won(r.final)}</strong></li>
           ))}
           {top5.length === 0 && <li className="muted">데이터 없음</li>}
         </ul>
