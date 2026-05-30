@@ -2,57 +2,57 @@ import { useState } from 'react';
 import { supabase } from '../supabaseClient';
 import './Login.css';
 
-// 이메일 매직링크 로그인 화면.
-// 가입은 대시보드에서 막고(미리 만든 계정만 허용), 여기서는 로그인 링크만 보낸다.
+// 이메일 + 비밀번호 로그인.
+// signInWithPassword 는 계정을 자동 생성하지 않으므로,
+// DB(대시보드)에 미리 등록해 둔 계정만 로그인할 수 있다(가입 경로 없음).
 export default function Login() {
   const [email, setEmail] = useState('');
-  const [status, setStatus] = useState('idle'); // idle | sending | sent | error
+  const [password, setPassword] = useState('');
+  const [status, setStatus] = useState('idle'); // idle | submitting | error
   const [message, setMessage] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email) return;
-    setStatus('sending');
+    if (!email || !password) return;
+    setStatus('submitting');
     setMessage('');
-    // 배포 경로(BASE_URL 포함)로 다시 돌아오도록 리다이렉트 지정
-    const redirectTo = window.location.origin + import.meta.env.BASE_URL;
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: redirectTo },
-    });
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       setStatus('error');
-      setMessage(error.message);
-    } else {
-      setStatus('sent');
-      setMessage('로그인 링크를 이메일로 보냈습니다. 메일함(스팸함 포함)을 확인하세요.');
+      setMessage('로그인에 실패했습니다. 이메일 또는 비밀번호를 확인하세요.');
     }
+    // 성공 시 onAuthStateChange 가 세션을 잡아 자동으로 앱 화면으로 전환됨
   };
 
   return (
     <div className="login-container">
       <div className="login-card">
         <h1 className="login-title">매출 관리</h1>
-        <p className="login-sub">로그인 후 이용할 수 있습니다.</p>
+        <p className="login-sub">등록된 계정으로 로그인하세요.</p>
 
-        {status === 'sent' ? (
-          <p className="login-msg success">{message}</p>
-        ) : (
-          <form className="login-form" onSubmit={handleSubmit}>
-            <input
-              type="email"
-              placeholder="이메일 주소"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoFocus
-            />
-            <button type="submit" disabled={status === 'sending'}>
-              {status === 'sending' ? '전송 중...' : '로그인 링크 받기'}
-            </button>
-            {status === 'error' && <p className="login-msg error">{message}</p>}
-          </form>
-        )}
+        <form className="login-form" onSubmit={handleSubmit}>
+          <input
+            type="email"
+            placeholder="이메일 주소"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="username"
+            required
+            autoFocus
+          />
+          <input
+            type="password"
+            placeholder="비밀번호"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
+            required
+          />
+          <button type="submit" disabled={status === 'submitting'}>
+            {status === 'submitting' ? '로그인 중...' : '로그인'}
+          </button>
+          {status === 'error' && <p className="login-msg error">{message}</p>}
+        </form>
       </div>
     </div>
   );
