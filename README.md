@@ -1,16 +1,43 @@
-# React + Vite
+# 매출 관리 (Sales Tracker)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+현금/카드 매출을 기록하고 정산월별 누적 매출을 집계하는 React + Vite 앱입니다.
 
-Currently, two official plugins are available:
+## 주요 동작
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- 현금/카드 매출 입력 (카드는 수수료 10% 차감되어 `final`로 집계)
+- **정산 기준: 매월 1일 ~ 다음달 1일 (달력상 한 달)**
+- "이번 달 누적 매출" 및 "전체 기록"을 정산월(매월 1일 기준)로 그룹·정렬
+- 모든 기록은 **Supabase DB**(`sales_records` 테이블)에 저장 (localStorage는 오프라인 캐시)
 
-## React Compiler
+## 설치 / 실행
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```
+npm install
+npm run dev
+```
 
-## Expanding the ESLint configuration
+## Supabase 설정 (필수)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+실제 DB 저장을 위해 **테이블 생성 + API 키 입력**이 필요합니다.
+자세한 절차는 [`SETUP_SUPABASE.md`](./SETUP_SUPABASE.md) 를 참고하세요.
+
+요약:
+1. Supabase SQL Editor에서 `supabase/migrations/0001_create_sales_records.sql` 실행
+2. `.env.local` 에 `VITE_SUPABASE_URL` 과 `VITE_SUPABASE_PUBLISHABLE_KEY`(publishable/anon 키) 설정
+
+## 데이터 모델 (`public.sales_records`)
+
+| 컬럼 | 타입 | 설명 |
+|---|---|---|
+| id | text (PK) | 클라이언트 생성 id |
+| type | text | '현금' \| '카드' |
+| original | numeric | 원금 |
+| final | numeric | 최종액(카드는 10% 차감) |
+| name | text | 고객명/메모 |
+| date | timestamptz | 기록 시각 |
+| created_at | timestamptz | 생성 시각 |
+
+## 설계/계획 문서
+
+- 설계: `docs/superpowers/specs/2026-05-30-settlement-period-and-supabase-design.md`
+- 구현 계획: `docs/superpowers/plans/2026-05-30-settlement-period-and-supabase.md`
