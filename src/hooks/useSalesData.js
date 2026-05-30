@@ -61,8 +61,11 @@ export const useSalesData = () => {
       const localRows = readCache();
       const alreadyMigrated = window.localStorage.getItem(MIGRATION_FLAG);
 
-      if (rows.length === 0 && localRows.length > 0 && !alreadyMigrated) {
-        const toInsert = localRows.map((r) => {
+      // 이 기기에 남아 있던 기존 기록을 DB로 1회 적재(병합).
+      // DB 상태와 무관하게, id 기준 upsert 로 "로컬에만 있던 기록"을 올린다.
+      // (DB에 이미 있는 id 는 ignoreDuplicates 로 건드리지 않음 → 기존 흐름 유지)
+      if (localRows.length > 0 && !alreadyMigrated) {
+        const toUpsert = localRows.map((r) => {
           const original = Number(r.original) || 0;
           return {
             id: String(r.id),
@@ -73,18 +76,21 @@ export const useSalesData = () => {
             date: r.date,
           };
         });
-        const { data: inserted, error: insErr } = await supabase
+        const { error: upErr } = await supabase
           .from(RECORDS_TABLE)
-          .insert(toInsert)
-          .select();
+          .upsert(toUpsert, { onConflict: 'id', ignoreDuplicates: true });
         if (cancelled) return;
-        if (insErr) {
-          setError(insErr.message);
+        if (upErr) {
+          setError(upErr.message);
         } else {
           window.localStorage.setItem(MIGRATION_FLAG, '1');
-          rows = (inserted ?? toInsert).sort(
-            (a, b) => new Date(b.date) - new Date(a.date)
-          );
+          // 병합 결과를 반영해 다시 로드
+          const { data: reloaded } = await supabase
+            .from(RECORDS_TABLE)
+            .select('*')
+            .order('date', { ascending: false });
+          if (cancelled) return;
+          rows = reloaded ?? rows;
         }
       }
 
