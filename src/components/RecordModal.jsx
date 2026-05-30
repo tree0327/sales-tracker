@@ -2,6 +2,8 @@ import { useModal } from '../context/ModalContext';
 import { getSalesPeriod, getPeriodKey } from '../utils/salesPeriod';
 import { useState } from 'react';
 import './RecordModal.css';
+import FilterButtons from './FilterButtons';
+import RecordItem from './RecordItem';
 
 export default function RecordModal({ isOpen, onClose, viewType, salesData, onDelete, onEdit }) {
   const [openPanels, setOpenPanels] = useState({});
@@ -34,49 +36,6 @@ export default function RecordModal({ isOpen, onClose, viewType, salesData, onDe
     }
   };
 
-  const formatDateTime = (isoString) => {
-    const dt = new Date(isoString);
-    return `${String(dt.getMonth() + 1).padStart(2, '0')}/${String(dt.getDate()).padStart(2, '0')} ${String(dt.getHours()).padStart(2, '0')}:${String(dt.getMinutes()).padStart(2, '0')}`;
-  };
-
-  const FilterButtons = ({ activeFilter, onFilterChange }) => (
-    <div className="filter-buttons">
-      {['전체', '현금', '카드'].map(f => (
-        <button
-          key={f}
-          className={`filter-btn ${activeFilter === f ? 'active' : ''} ${f === '현금' ? 'cash-filter' : f === '카드' ? 'card-filter' : ''}`}
-          onClick={e => { e.stopPropagation(); onFilterChange(f); }}
-        >
-          {f}
-        </button>
-      ))}
-    </div>
-  );
-
-  const RecordItem = ({ item, showActions = true }) => (
-    <div className="record-item">
-      <div className="record-row">
-        <div className="type-info">
-          <span className={`type-badge ${item.type === '현금' ? 'cash' : 'card'}`}>{item.type}</span>
-          {item.name && <span className="customer-name">{item.name}</span>}
-        </div>
-        <span className="final-amt">{item.final.toLocaleString()}원</span>
-      </div>
-      <div className="sub-row">
-        <span>
-          {formatDateTime(item.date)}
-          {item.type === '카드' ? ` (원금: ${item.original.toLocaleString()}원, 수수료 10% 차감)` : ''}
-        </span>
-        {showActions && (
-          <div className="action-btns">
-            <button className="action-btn btn-edit" onClick={() => onEdit(item.type, item.id, item.original, item.name)}>수정</button>
-            <button className="action-btn btn-delete" onClick={() => handleDelete(item.id)}>삭제</button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-
   let content;
 
   if (viewType === 'current') {
@@ -96,7 +55,7 @@ export default function RecordModal({ isOpen, onClose, viewType, salesData, onDe
             <div>기록이 없습니다.</div>
           </div>
         ) : (
-          filteredData.map(item => <RecordItem key={item.id} item={item} showActions={true} />)
+          filteredData.map(item => <RecordItem key={item.id} item={item} showActions={true} onEdit={onEdit} onDelete={handleDelete} />)
         )}
       </>
     );
@@ -155,7 +114,7 @@ export default function RecordModal({ isOpen, onClose, viewType, salesData, onDe
                     <div>해당 결제 수단의 기록이 없습니다.</div>
                   </div>
                 ) : (
-                  filteredItems.map(item => <RecordItem key={item.id} item={item} showActions={true} />)
+                  filteredItems.map(item => <RecordItem key={item.id} item={item} showActions={true} onEdit={onEdit} onDelete={handleDelete} />)
                 )}
               </div>
             )}
