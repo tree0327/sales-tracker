@@ -133,6 +133,84 @@ export function thisWeekTotal(records, now = new Date()) {
   };
 }
 
+const WEEKDAY_KR = ['일', '월', '화', '수', '목', '금', '토'];
+
+function groupTotals(items) {
+  return {
+    total: sum(items, (r) => r.final),
+    cash: sum(items.filter((r) => r.type === '현금'), (r) => r.final),
+    card: sum(items.filter((r) => r.type === '카드'), (r) => r.final),
+  };
+}
+
+const byDateDesc = (a, b) => new Date(b.date) - new Date(a.date);
+const keyDesc = (a, b) => (a[0] < b[0] ? 1 : a[0] > b[0] ? -1 : 0);
+
+// 정산월(YYYY-MM) 그룹. 최근월 우선.
+export function groupByMonth(records) {
+  const map = new Map();
+  for (const r of records) {
+    const d = new Date(r.date);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    if (!map.has(key)) map.set(key, []);
+    map.get(key).push(r);
+  }
+  return [...map.entries()].sort(keyDesc).map(([key, items]) => {
+    const [y, m] = key.split('-');
+    const sorted = [...items].sort(byDateDesc);
+    return { key, label: `${y}년 ${parseInt(m, 10)}월`, ...groupTotals(sorted), items: sorted };
+  });
+}
+
+// ISO주(월~일) 그룹. records 는 같은 달 가정. N주차 = 그 달 첫 ISO주를 1주차로. 최근주 우선.
+export function groupByWeek(records) {
+  if (records.length === 0) return [];
+  const ref = new Date(records[0].date);
+  const monthStart = new Date(ref.getFullYear(), ref.getMonth(), 1);
+  const firstWeekMs = isoWeekStart(monthStart).getTime();
+  const map = new Map();
+  for (const r of records) {
+    const ws = isoWeekStart(r.date);
+    const key = ws.toISOString();
+    if (!map.has(key)) map.set(key, { ws, items: [] });
+    map.get(key).items.push(r);
+  }
+  return [...map.entries()].sort(keyDesc).map(([key, { ws, items }]) => {
+    const weekNo = Math.round((ws.getTime() - firstWeekMs) / (7 * 86400000)) + 1;
+    const end = new Date(ws);
+    end.setDate(end.getDate() + 6);
+    const sorted = [...items].sort(byDateDesc);
+    return {
+      key,
+      label: `${weekNo}주차`,
+      rangeLabel: `${ws.getMonth() + 1}/${ws.getDate()}~${end.getMonth() + 1}/${end.getDate()}`,
+      ...groupTotals(sorted),
+      items: sorted,
+    };
+  });
+}
+
+// 날짜(YYYY-MM-DD) 그룹. 최근일 우선.
+export function groupByDay(records) {
+  const map = new Map();
+  for (const r of records) {
+    const d = new Date(r.date);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    if (!map.has(key)) map.set(key, []);
+    map.get(key).push(r);
+  }
+  return [...map.entries()].sort(keyDesc).map(([key, items]) => {
+    const d = new Date(items[0].date);
+    const sorted = [...items].sort(byDateDesc);
+    return {
+      key,
+      label: `${d.getMonth() + 1}/${d.getDate()} (${WEEKDAY_KR[d.getDay()]})`,
+      ...groupTotals(sorted),
+      items: sorted,
+    };
+  });
+}
+
 function scopeRecords(records, scope, now = new Date()) {
   if (scope === 'all' || !scope) return records;
   const ym = ymOfDate(now);
