@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useSalesData } from './hooks/useSalesData';
 import { getSalesPeriod, getPeriodEndDay } from './utils/salesPeriod';
+import { todayTotal, thisWeekTotal } from './utils/analytics';
 import { supabase } from './supabaseClient';
 import { useModal } from './context/modal-context';
 import InputModal from './components/InputModal';
@@ -55,6 +56,10 @@ function App() {
   const currentTotal = currentData.reduce((sum, item) => sum + item.final, 0);
   const currentCashTotal = currentData.filter(i => i.type === '현금').reduce((sum, i) => sum + i.final, 0);
   const currentCardTotal = currentData.filter(i => i.type === '카드').reduce((sum, i) => sum + i.final, 0);
+
+  const now = new Date();
+  const todaySales = todayTotal(salesData, now);
+  const weekSales = thisWeekTotal(salesData, now);
 
   const formatPeriodDate = (date) => {
     return `${date.getMonth() + 1}/${date.getDate()}`;
@@ -137,8 +142,19 @@ function App() {
         </button>
       </div>
 
-      <div 
-        className="bottom-bar glass" 
+      <div className="summary-cards">
+        <div className="summary-card glass">
+          <span className="summary-label">오늘 일매출</span>
+          <span className="summary-value">{todaySales.toLocaleString()}<em>원</em></span>
+        </div>
+        <div className="summary-card glass">
+          <span className="summary-label">이번 주 매출 <em>{weekSales.rangeLabel}</em></span>
+          <span className="summary-value">{weekSales.total.toLocaleString()}<em>원</em></span>
+        </div>
+      </div>
+
+      <div
+        className="bottom-bar glass"
         onClick={() => openRecordModal('current')}
       >
         <span className="period-range">{formatPeriodDate(period.start)} ~ {formatPeriodDate(getPeriodEndDay(period.start))}</span>

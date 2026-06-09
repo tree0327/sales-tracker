@@ -219,3 +219,32 @@
   color: var(--primary);
   border: 1px solid #bfdbfe;
 }
+
+/* 직원 요약 카드 (오늘/이번 주) */
+.summary-cards {
+  display: flex;
+  gap: 12px;
+  margin: 16px 0;
+  flex-wrap: wrap;
+}
+.summary-card {
+  flex: 1 1 140px;
+  padding: 16px;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+}
+.summary-label {
+  display: block;
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.summary-label em { font-style: normal; font-weight: 500; font-size: 11px; }
+.summary-value {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+.summary-value em { font-style: normal; font-size: 14px; font-weight: 700; margin-left: 2px; }
