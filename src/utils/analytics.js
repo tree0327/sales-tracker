@@ -15,6 +15,124 @@ export function filterByRange(records, start, end) {
   });
 }
 
+// ISO 주: 월요일 시작. 주어진 날짜가 속한 주의 월요일 00:00(로컬) Date 반환.
+export function isoWeekStart(date) {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  const day = d.getDay(); // 0=일 .. 6=토
+  const diff = day === 0 ? -6 : 1 - day; // 월요일까지 이동
+  d.setDate(d.getDate() + diff);
+  return d;
+}
+
+const fmtMD = (d) => `${d.getMonth() + 1}/${d.getDate()}`;
+
+// [start, end) 구간 합계 계산 헬퍼
+function bucketTotals(records, start, end) {
+  const inRange = records.filter((r) => {
+    const t = new Date(r.date).getTime();
+    return t >= start.getTime() && t < end.getTime();
+  });
+  return {
+    items: inRange,
+    total: sum(inRange, (r) => r.final),
+    cash: sum(inRange.filter((r) => r.type === '현금'), (r) => r.final),
+    card: sum(inRange.filter((r) => r.type === '카드'), (r) => r.final),
+  };
+}
+
+// 최근 weeksBack 주(월~일)의 주별 매출. 과거→현재 순, 마지막이 now가 속한 주.
+export function weeklyTrend(records, weeksBack = 8, now = new Date()) {
+  const thisWeekStart = isoWeekStart(now);
+  const out = [];
+  for (let i = weeksBack - 1; i >= 0; i--) {
+    const start = new Date(thisWeekStart);
+    start.setDate(start.getDate() - i * 7);
+    const end = new Date(start);
+    end.setDate(end.getDate() + 7); // 미포함 경계
+    const endLabel = new Date(start);
+    endLabel.setDate(endLabel.getDate() + 6);
+    const b = bucketTotals(records, start, end);
+    out.push({
+      weekStart: start.toISOString(),
+      label: `${fmtMD(start)}~${fmtMD(endLabel)}`,
+      total: b.total,
+      cash: b.cash,
+      card: b.card,
+    });
+  }
+  return out;
+}
+
+// 이번 정산월(달력월)에 걸치는 각 ISO주(월~일). 첫 주 = 1주차.
+export function weeksInMonth(records, now = new Date()) {
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1); // 미포함
+  let weekStart = isoWeekStart(monthStart);
+  const out = [];
+  let n = 1;
+  while (weekStart.getTime() < monthEnd.getTime()) {
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekEnd.getDate() + 7);
+    const endLabel = new Date(weekStart);
+    endLabel.setDate(endLabel.getDate() + 6);
+    const b = bucketTotals(records, weekStart, weekEnd);
+    out.push({
+      label: `${n}주차`,
+      rangeStart: weekStart.toISOString(),
+      rangeEnd: weekEnd.toISOString(),
+      rangeLabel: `${fmtMD(weekStart)}~${fmtMD(endLabel)}`,
+      total: b.total,
+    });
+    weekStart = new Date(weekStart);
+    weekStart.setDate(weekStart.getDate() + 7);
+    n++;
+  }
+  return out;
+}
+
+// 특정 날짜(로컬 자정~다음날 자정)의 상세. dateISO 는 ISO 문자열 또는 Date.
+export function dayDetail(records, dateISO) {
+  const d = new Date(dateISO);
+  const start = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const end = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1);
+  const b = bucketTotals(records, start, end);
+  const items = [...b.items].sort((a, z) => new Date(a.date) - new Date(z.date));
+  const total = b.total;
+  return {
+    total,
+    count: items.length,
+    cash: b.cash,
+    card: b.card,
+    cashPct: total ? Math.round((b.cash / total) * 100) : 0,
+    cardPct: total ? Math.round((b.card / total) * 100) : 0,
+    items,
+  };
+}
+
+// 오늘 총 매출(숫자).
+export function todayTotal(records, now = new Date()) {
+  return dayDetail(records, now).total;
+}
+
+// 이번 주(월~일) 매출 요약.
+export function thisWeekTotal(records, now = new Date()) {
+  const start = isoWeekStart(now);
+  const end = new Date(start);
+  end.setDate(end.getDate() + 7);
+  const endLabel = new Date(start);
+  endLabel.setDate(endLabel.getDate() + 6);
+  const b = bucketTotals(records, start, end);
+  return {
+    total: b.total,
+    cash: b.cash,
+    card: b.card,
+    rangeStart: start.toISOString(),
+    rangeEnd: end.toISOString(),
+    rangeLabel: `${fmtMD(start)}~${fmtMD(endLabel)}`,
+  };
+}
+
 function scopeRecords(records, scope, now = new Date()) {
   if (scope === 'all' || !scope) return records;
   const ym = ymOfDate(now);
