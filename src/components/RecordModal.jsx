@@ -2,6 +2,7 @@ import { useModal } from '../context/modal-context';
 import { getSalesPeriod } from '../utils/salesPeriod';
 import { groupByMonth, groupByWeek, groupByDay } from '../utils/analytics';
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import './RecordModal.css';
 import FilterButtons from './FilterButtons';
 import RecordItem from './RecordItem';
@@ -162,19 +163,20 @@ export default function RecordModal({ isOpen, onClose, viewType, salesData, onDe
     }
   }
 
-  return (
+  return createPortal(
     <div className="modal-backdrop record-modal-backdrop" onClick={onClose}>
       <div className="modal-content record-modal-content glass" onClick={e => e.stopPropagation()}>
         <h3>{viewType === 'current' ? '이번 달 상세 기록' : '전체 매출 기록'}</h3>
-        
+
         <div className="record-list">
           {content}
         </div>
-        
+
         <div className="btn-group">
           <button className="btn-close" onClick={onClose}>닫기</button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

@@ -4,7 +4,8 @@
 }
 
 .record-modal-content {
-  height: 85vh;
+  height: 85dvh;
+  max-height: 88dvh;
   padding: 24px 20px;
 }
 

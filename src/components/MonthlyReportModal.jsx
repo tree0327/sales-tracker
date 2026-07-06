@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import './MonthlyReportModal.css';
 
 const won = (n) => `${(Number(n) || 0).toLocaleString()}원`;
@@ -10,7 +11,7 @@ export default function MonthlyReportModal({ report, goal = 0, onClose, onGoDash
   const goalPct = goal ? Math.round((report.total / goal) * 100) : null;
   const mom = report.momRatePct;
 
-  return (
+  return createPortal(
     <div className="report-overlay" role="dialog" aria-modal="true" aria-label={title}>
       <div className="report-modal">
         <div className="report-head">
@@ -66,6 +67,7 @@ export default function MonthlyReportModal({ report, goal = 0, onClose, onGoDash
           <button className="report-btn-primary" onClick={onGoDashboard}>대시보드에서 자세히 보기</button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

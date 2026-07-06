@@ -46,18 +46,20 @@ export default function Shell() {
   return (
     <div className="shell">
       <div className="shell-tabs">
-        <button
-          className={`shell-tab ${tab === 'input' ? 'active' : ''}`}
-          onClick={() => setTab('input')}
-        >매출 입력</button>
-        <button
-          className={`shell-tab ${tab === 'dashboard' ? 'active' : ''}`}
-          onClick={() => setTab('dashboard')}
-        >분석</button>
-        <button
-          className={`shell-tab ${tab === 'ai' ? 'active' : ''}`}
-          onClick={() => setTab('ai')}
-        >AI</button>
+        <div className="shell-tab-group">
+          <button
+            className={`shell-tab ${tab === 'input' ? 'active' : ''}`}
+            onClick={() => setTab('input')}
+          >입력</button>
+          <button
+            className={`shell-tab ${tab === 'dashboard' ? 'active' : ''}`}
+            onClick={() => setTab('dashboard')}
+          >분석</button>
+          <button
+            className={`shell-tab ${tab === 'ai' ? 'active' : ''}`}
+            onClick={() => setTab('ai')}
+          >AI</button>
+        </div>
         <button className="shell-logout" onClick={() => supabase.auth.signOut()}>로그아웃</button>
       </div>
 

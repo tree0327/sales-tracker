@@ -101,10 +101,6 @@ export default function AdminDashboard({ salesData, loading }) {
 
   return (
     <div className="admin">
-      <div className="admin-top">
-        <h1 className="title">관리자 대시보드</h1>
-      </div>
-
       <div className="kpi-grid">
         <div className="kpi-card"><span>이번 달 총매출</span><strong>{won(kpi.thisMonthTotal)}</strong></div>
         <div className="kpi-card"><span>거래 건수</span><strong>{kpi.count}건</strong></div>

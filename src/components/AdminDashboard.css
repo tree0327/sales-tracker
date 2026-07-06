@@ -6,11 +6,6 @@
   overflow-y: auto;
   height: 100%;
 }
-.admin-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

@@ -1,35 +1,13 @@
 import { useState } from 'react';
 import { getSalesPeriod, getPeriodEndDay } from './utils/salesPeriod';
 import { todayTotal, thisWeekTotal } from './utils/analytics';
-import { useModal } from './context/modal-context';
 import InputModal from './components/InputModal';
 import RecordModal from './components/RecordModal';
 import './App.css';
 
 function App({ sales }) {
-  const { salesData, addRecord, updateRecord, deleteRecord, backupLocalToDb, loading, error } =
-    sales;
-  const { showAlert } = useModal();
-  const [backingUp, setBackingUp] = useState(false);
+  const { salesData, addRecord, updateRecord, deleteRecord, loading, error } = sales;
 
-  const handleBackup = async () => {
-    setBackingUp(true);
-    try {
-      const { found, error, already } = await backupLocalToDb();
-      if (error) {
-        showAlert('백업 실패', `DB 저장 중 오류가 발생했습니다: ${error}`);
-      } else if (already) {
-        showAlert('백업', '이미 백업이 완료된 기기입니다.');
-      } else if (found === 0) {
-        showAlert('백업', '이 기기에서 올릴 기존 기록이 없습니다.');
-      } else {
-        showAlert('백업 완료', `이 기기의 기록 ${found}건을 DB에 저장했습니다.`);
-      }
-    } finally {
-      setBackingUp(false);
-    }
-  };
-  
   const [modalState, setModalState] = useState({
     isOpen: false,
     type: '',
@@ -99,21 +77,6 @@ function App({ sales }) {
     <div className="app-container">
       {error && <div className="status-banner error">저장 중 문제가 발생했습니다: {error}</div>}
       {loading && <div className="status-banner info">동기화 중…</div>}
-      <div className="top-bar">
-        <h1 className="title">매출 관리</h1>
-        <div className="top-actions">
-          <button
-            className="btn-backup"
-            onClick={handleBackup}
-            disabled={backingUp}
-          >
-            {backingUp ? '백업 중…' : '기기 기록 백업'}
-          </button>
-          <button className="btn-all-records" onClick={() => openRecordModal('all')}>
-            전체 기록
-          </button>
-        </div>
-      </div>
 
       <div className="main-buttons">
         <button 
@@ -165,6 +128,10 @@ function App({ sales }) {
         </div>
         <span className="click-hint">터치해서 기록 확인 및 수정</span>
       </div>
+
+      <button className="btn-all-records-full" onClick={() => openRecordModal('all')}>
+        전체 기록 보기
+      </button>
 
       <InputModal
         key={modalState.seq}
