@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useModal } from '../context/modal-context';
 import { finalAmount, CARD_FEE_RATE } from '../utils/fee.js';
+import { buildRecordDateISO } from '../utils/recordDate.js';
 import './InputModal.css';
 
 // 부모(App)에서 열 때마다 key 를 바꿔 리마운트하므로,
@@ -31,7 +32,8 @@ export default function InputModal({ isOpen, onClose, onSave, initialType, initi
       return;
     }
     // name is optional
-    const dateISO = date ? new Date(date + 'T12:00:00').toISOString() : null;
+    // 신규는 현재 시각을, 수정은 원래 기록의 시각을 보존해 정확한 입력 시각을 반영한다.
+    const dateISO = date ? buildRecordDateISO(date, initialData?.date ?? null) : null;
     onSave(initialType, Number(amount), name, dateISO);
     onClose();
   };
