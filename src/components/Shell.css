@@ -1,0 +1,17 @@
+.shell { display: flex; flex-direction: column; min-height: 100%; }
+.shell-tabs {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px; position: sticky; top: 0; z-index: 50;
+  background: var(--bg-color, #fff); border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+.shell-tab {
+  padding: 8px 16px; border: none; border-radius: 999px; cursor: pointer;
+  font-size: 15px; font-weight: 700; background: var(--input-bg, #f0f0f3);
+  color: var(--text-secondary, #666);
+}
+.shell-tab.active { background: var(--primary, #007aff); color: #fff; }
+.shell-logout {
+  margin-left: auto; padding: 8px 14px; border: none; border-radius: 999px; cursor: pointer;
+  font-size: 14px; font-weight: 600; background: rgba(255, 59, 48, 0.1); color: var(--danger, #ff3b30);
+}
+.shell-body { flex: 1; }

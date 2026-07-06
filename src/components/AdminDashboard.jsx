@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { useSalesData } from '../hooks/useSalesData';
-import { supabase } from '../supabaseClient';
 import {
   kpiSummary, monthlyTrend, dailySales, byWeekday, byHour, samePeriodCompare,
   cashCardRatio, cardFeeTotal, originalVsFinal, topTransactions, byCustomer,
@@ -105,7 +104,6 @@ export default function AdminDashboard() {
     <div className="admin">
       <div className="admin-top">
         <h1 className="title">관리자 대시보드</h1>
-        <button className="btn-logout" onClick={() => supabase.auth.signOut()}>로그아웃</button>
       </div>
 
       <div className="kpi-grid">

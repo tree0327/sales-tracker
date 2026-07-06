@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useSalesData } from './hooks/useSalesData';
 import { getSalesPeriod, getPeriodEndDay } from './utils/salesPeriod';
 import { todayTotal, thisWeekTotal } from './utils/analytics';
-import { supabase } from './supabaseClient';
 import { useModal } from './context/modal-context';
 import InputModal from './components/InputModal';
 import RecordModal from './components/RecordModal';
@@ -113,9 +112,6 @@ function App() {
           </button>
           <button className="btn-all-records" onClick={() => openRecordModal('all')}>
             전체 기록
-          </button>
-          <button className="btn-logout" onClick={() => supabase.auth.signOut()}>
-            로그아웃
           </button>
         </div>
       </div>
