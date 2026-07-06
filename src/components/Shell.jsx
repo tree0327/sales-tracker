@@ -7,6 +7,7 @@ import {
 } from '../utils/monthlyReport';
 import App from '../App.jsx';
 import AdminDashboard from './AdminDashboard.jsx';
+import AiChat from './AiChat.jsx';
 import MonthlyReportModal from './MonthlyReportModal.jsx';
 import { GOAL_KEY } from '../utils/storageKeys';
 import './Shell.css';
@@ -53,11 +54,17 @@ export default function Shell() {
           className={`shell-tab ${tab === 'dashboard' ? 'active' : ''}`}
           onClick={() => setTab('dashboard')}
         >분석</button>
+        <button
+          className={`shell-tab ${tab === 'ai' ? 'active' : ''}`}
+          onClick={() => setTab('ai')}
+        >AI</button>
         <button className="shell-logout" onClick={() => supabase.auth.signOut()}>로그아웃</button>
       </div>
 
       <div className="shell-body">
-        {tab === 'input' ? <App sales={sales} /> : <AdminDashboard salesData={sales.salesData} loading={sales.loading} />}
+        {tab === 'input' && <App sales={sales} />}
+        {tab === 'dashboard' && <AdminDashboard salesData={sales.salesData} loading={sales.loading} />}
+        {tab === 'ai' && <AiChat salesData={sales.salesData} />}
       </div>
 
       {show && !dismissed && (
