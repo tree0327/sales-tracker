@@ -83,6 +83,7 @@ button:active {
 
 #root {
   flex: 1;
+  min-height: 0; /* flex 아이템이 내용만큼 부풀지 않고 뷰포트에 바운드되게(내부 스크롤 성립) */
   display: flex;
   flex-direction: column;
   max-width: 600px;
