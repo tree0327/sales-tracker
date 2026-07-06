@@ -34,10 +34,22 @@ function messagesFor(mode: string, payload: any): Msg[] | null {
   }
   if (mode === "chat") {
     const ctx = payload?.context ? `참고용 매출 요약(JSON): ${JSON.stringify(payload.context)}\n` : "";
+    const memo = payload?.summary ? `이전 대화 요약: ${payload.summary}\n` : "";
     const history: any[] = Array.isArray(payload?.messages) ? payload.messages : [];
     return [
-      { role: "system", content: `너는 친절한 한국어 비서로 매출 관리 앱에 내장돼 있다. 매출 관련 질문에는 아래 요약 데이터를 근거로 답하고, 일반적인 질문에도 자유롭게 답하라. 요약에 없는 매출 수치는 모른다고 답하라.\n${ctx}` },
+      { role: "system", content: `너는 친절한 한국어 비서로 매출 관리 앱에 내장돼 있다. 매출 관련 질문에는 아래 요약 데이터를 근거로 답하고, 일반적인 질문에도 자유롭게 답하라. '이전 대화 요약'은 과거 맥락이니 참고하되 최근 메시지를 우선하라. 요약에 없는 매출 수치는 모른다고 답하라.\n${memo}${ctx}` },
       ...history.map((m) => ({ role: m.role === "user" ? "user" : "assistant", content: String(m.content ?? "") } as Msg)),
+    ];
+  }
+  if (mode === "summarize") {
+    const prev = payload?.previousSummary ? `기존 요약:\n${payload.previousSummary}\n\n` : "";
+    const msgs: any[] = Array.isArray(payload?.messages) ? payload.messages : [];
+    const convo = msgs
+      .map((m) => `${m.role === "user" ? "사용자" : "assistant"}: ${String(m.content ?? "")}`)
+      .join("\n");
+    return [
+      { role: "system", content: "너는 대화 요약 비서다. 기존 요약과 새 대화를 하나로 합쳐, 이후 대화에 필요한 핵심 사실·맥락·사용자 선호를 보존한 간결한 한국어 요약으로 정리하라. 인사말·잡담은 생략하고 사실 위주로." },
+      { role: "user", content: `${prev}새 대화:\n${convo}\n\n위 내용을 반영한 하나의 갱신된 요약만 출력.` },
     ];
   }
   return null;
