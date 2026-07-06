@@ -1,3 +1,11 @@
+.ai-chat-head { display: flex; align-items: center; justify-content: space-between; padding: 4px 4px 10px; }
+.ai-chat-title { font-size: 15px; font-weight: 800; }
+.ai-chat-reset {
+  padding: 6px 12px; border: none; border-radius: 999px; cursor: pointer;
+  font-size: 13px; font-weight: 600; background: var(--input-bg, #f0f0f3); color: var(--text-secondary, #666);
+}
+.ai-chat-reset:disabled { opacity: 0.5; cursor: default; }
+.ai-chat-notice { margin: 0 0 6px; font-size: 12px; color: var(--text-secondary, #888); }
 .ai-chat { display: flex; flex-direction: column; height: 100%; padding: 12px; box-sizing: border-box; }
 .ai-chat-log { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-bottom: 8px; }
 .ai-msg { display: flex; }
