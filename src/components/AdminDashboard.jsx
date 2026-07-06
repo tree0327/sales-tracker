@@ -6,6 +6,7 @@ import {
   weeklyTrend, weeksInMonth, dayDetail,
 } from '../utils/analytics';
 import { GOAL_KEY } from '../utils/storageKeys';
+import AiInsights from './AiInsights';
 import './AdminDashboard.css';
 
 const won = (n) => `${(Number(n) || 0).toLocaleString()}원`;
@@ -272,6 +273,8 @@ export default function AdminDashboard({ salesData, loading }) {
           {customers.length === 0 && <li className="muted">고객명이 입력된 기록 없음</li>}
         </ul>
       </div>
+
+      <AiInsights salesData={salesData} />
 
       <div className="admin-section">
         <h2>기간 조회 & 내보내기</h2>
