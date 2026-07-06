@@ -1,15 +1,14 @@
 import { useMemo, useState } from 'react';
-import { useSalesData } from '../hooks/useSalesData';
 import {
   kpiSummary, monthlyTrend, dailySales, byWeekday, byHour, samePeriodCompare,
   cashCardRatio, cardFeeTotal, originalVsFinal, topTransactions, byCustomer,
   forecast, toCSV, filterByRange,
   weeklyTrend, weeksInMonth, dayDetail,
 } from '../utils/analytics';
+import { GOAL_KEY } from '../utils/storageKeys';
 import './AdminDashboard.css';
 
 const won = (n) => `${(Number(n) || 0).toLocaleString()}원`;
-const GOAL_KEY = 'admin_monthly_goal';
 
 // 의존성 없는 순수 CSS 막대 차트.
 // data: [{ label, value }]
@@ -33,8 +32,7 @@ function BarChartLite({ data, color = '#007aff', unit = '원' }) {
   );
 }
 
-export default function AdminDashboard() {
-  const { salesData, loading } = useSalesData();
+export default function AdminDashboard({ salesData, loading }) {
   const [now] = useState(() => new Date());
   const [goal, setGoal] = useState(() => Number(localStorage.getItem(GOAL_KEY)) || 0);
   const [rangeStart, setRangeStart] = useState('');

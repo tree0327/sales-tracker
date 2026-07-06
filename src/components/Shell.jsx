@@ -8,13 +8,13 @@ import {
 import App from '../App.jsx';
 import AdminDashboard from './AdminDashboard.jsx';
 import MonthlyReportModal from './MonthlyReportModal.jsx';
+import { GOAL_KEY } from '../utils/storageKeys';
 import './Shell.css';
-
-const GOAL_KEY = 'admin_monthly_goal';
 
 export default function Shell() {
   const [tab, setTab] = useState('input'); // 'input' | 'dashboard'
-  const { salesData, loading } = useSalesData();
+  const sales = useSalesData();
+  const { salesData, loading } = sales;
 
   // 직전 정산월 리포트(데이터 로딩 완료 후에만 판정).
   const prevKey = useMemo(() => prevPeriodKey(new Date()), []);
@@ -37,6 +37,8 @@ export default function Shell() {
     setTab('dashboard');
   };
 
+  // 참고: 여기서 읽는 목표는 월별로 구분되지 않는 현재 목표값이며,
+  // 지난달 달성률도 (단일 사용자 설계상 의도적으로) 이 현재 목표값 기준으로 계산된다.
   let goal = 0;
   try { goal = Number(window.localStorage.getItem(GOAL_KEY)) || 0; } catch { goal = 0; }
 
@@ -55,7 +57,7 @@ export default function Shell() {
       </div>
 
       <div className="shell-body">
-        {tab === 'input' ? <App /> : <AdminDashboard />}
+        {tab === 'input' ? <App sales={sales} /> : <AdminDashboard salesData={sales.salesData} loading={sales.loading} />}
       </div>
 
       {show && !dismissed && (

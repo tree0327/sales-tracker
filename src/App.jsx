@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useSalesData } from './hooks/useSalesData';
 import { getSalesPeriod, getPeriodEndDay } from './utils/salesPeriod';
 import { todayTotal, thisWeekTotal } from './utils/analytics';
 import { useModal } from './context/modal-context';
@@ -7,9 +6,9 @@ import InputModal from './components/InputModal';
 import RecordModal from './components/RecordModal';
 import './App.css';
 
-function App() {
+function App({ sales }) {
   const { salesData, addRecord, updateRecord, deleteRecord, backupLocalToDb, loading, error } =
-    useSalesData();
+    sales;
   const { showAlert } = useModal();
   const [backingUp, setBackingUp] = useState(false);
 
