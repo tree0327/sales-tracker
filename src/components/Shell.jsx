@@ -64,7 +64,7 @@ export default function Shell() {
       <div className="shell-body">
         {tab === 'input' && <App sales={sales} />}
         {tab === 'dashboard' && <AdminDashboard salesData={sales.salesData} loading={sales.loading} />}
-        {tab === 'ai' && <AiChat salesData={sales.salesData} />}
+        {tab === 'ai' && <AiChat salesData={sales.salesData} dataLoading={sales.loading} />}
       </div>
 
       {show && !dismissed && (
