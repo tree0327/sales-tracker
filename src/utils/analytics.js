@@ -364,3 +364,46 @@ export function toCSV(records) {
   }
   return lines.join('\n');
 }
+
+// 주어진 달(monthDate가 속한 정산월)의 요약 리포트. 월말 팝업용.
+export function monthlyReport(records, monthDate) {
+  const ym = ymOfDate(monthDate);
+  const prev = new Date(monthDate.getFullYear(), monthDate.getMonth() - 1, 1);
+  const prevYm = ymOfDate(prev);
+
+  const inMonth = records.filter((r) => ymOf(r.date) === ym);
+  const inPrev = records.filter((r) => ymOf(r.date) === prevYm);
+
+  const total = sum(inMonth, (r) => r.final);
+  const prevTotal = sum(inPrev, (r) => r.final);
+  const count = inMonth.length;
+  const avgPerTxn = count ? Math.round(total / count) : 0;
+  const momRatePct = prevTotal
+    ? Math.round(((total - prevTotal) / prevTotal) * 100)
+    : null;
+
+  const cash = sum(inMonth.filter((r) => r.type === '현금'), (r) => r.final);
+  const card = sum(inMonth.filter((r) => r.type === '카드'), (r) => r.final);
+  const denom = cash + card;
+  const cashPct = denom ? Math.round((cash / denom) * 100) : 0;
+  const cardPct = denom ? Math.round((card / denom) * 100) : 0;
+
+  const cardFee = sum(
+    inMonth.filter((r) => r.type === '카드'),
+    (r) => (Number(r.original) || 0) - (Number(r.final) || 0)
+  );
+
+  const byDay = {};
+  for (const r of inMonth) {
+    const day = new Date(r.date).getDate();
+    byDay[day] = (byDay[day] || 0) + (Number(r.final) || 0);
+  }
+  const days = Object.entries(byDay).map(([d, t]) => ({ day: Number(d), total: t }));
+  const bestDay = days.length ? days.reduce((a, b) => (b.total > a.total ? b : a)) : null;
+
+  const top3 = [...inMonth]
+    .sort((a, b) => (Number(b.final) || 0) - (Number(a.final) || 0))
+    .slice(0, 3);
+
+  return { ym, total, count, avgPerTxn, momRatePct, cash, card, cashPct, cardPct, cardFee, bestDay, top3 };
+}
