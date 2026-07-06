@@ -21,7 +21,7 @@ export default function RecordItem({ item, showActions = true, onEdit, onDelete 
       <div className="sub-row">
         <span>
           {formatDateTime(item.date)}
-          {item.type === '카드' ? ` (원금: ${item.original.toLocaleString()}원, 수수료 ${(CARD_FEE_RATE * 100).toFixed(1)}% 차감)` : ''}
+          {item.type === '카드' ? ` (원금: ${item.original.toLocaleString()}원, 수수료 ${Number((CARD_FEE_RATE * 100).toFixed(1))}% 차감)` : ''}
         </span>
         {showActions && (
           <div className="action-btns">

@@ -73,7 +73,7 @@ export default function InputModal({ isOpen, onClose, onSave, initialType, initi
           />
           {initialType === '카드' && amount && (
             <div className="fee-notice">
-              수수료 {(CARD_FEE_RATE * 100).toFixed(1)}% 차감 후: <strong>{finalAmount('카드', Number(amount)).toLocaleString()}원</strong>
+              수수료 {Number((CARD_FEE_RATE * 100).toFixed(1))}% 차감 후: <strong>{finalAmount('카드', Number(amount)).toLocaleString()}원</strong>
             </div>
           )}
         </div>
