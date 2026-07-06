@@ -8,10 +8,14 @@ async function currentUserId() {
 }
 
 // 로그인 사용자의 저장된 대화 복원. 없으면 null.
+// (RLS가 이미 본인 행만 반환하지만, 명시적으로 user_id로 필터해 의도를 분명히 한다.)
 export async function loadChat() {
+  const uid = await currentUserId();
+  if (!uid) return null;
   const { data, error } = await supabase
     .from(TABLE)
     .select('messages, summary, summarized_count')
+    .eq('user_id', uid)
     .maybeSingle();
   if (error) throw new Error(error.message);
   if (!data) return null;
