@@ -57,11 +57,17 @@ export default function AiChat({ salesData, dataLoading }) {
       let nextCount = summarizedCount;
       const plan = planSummarization(withUser.length, summarizedCount);
       if (plan.shouldSummarize) {
-        nextSummary = await callAI('summarize', {
-          previousSummary: summary,
-          messages: withUser.slice(plan.from, plan.to),
-        });
-        nextCount = plan.to;
+        try {
+          nextSummary = await callAI('summarize', {
+            previousSummary: summary,
+            messages: withUser.slice(plan.from, plan.to),
+          });
+          nextCount = plan.to;
+        } catch {
+          // 요약 실패(예: 함수 미배포) → 이번 턴은 요약 없이 전체 verbatim으로 진행(대화는 계속 작동)
+          nextSummary = summary;
+          nextCount = summarizedCount;
+        }
       }
       // 2) 이전요약 + 미요약 전체(verbatim) + 매출 컨텍스트로 chat 호출
       const context = buildChatContext(salesData, new Date());

@@ -1,6 +1,6 @@
 import { supabase } from '../supabaseClient';
 
-// Edge Function 'ai' 호출. mode: 'report' | 'chat' | 'anomaly'
+// Edge Function 'ai' 호출. mode: 'report' | 'chat' | 'anomaly' | 'summarize'
 // 성공 시 생성 텍스트(string) 반환, 실패 시 throw.
 export async function callAI(mode, payload) {
   const { data, error } = await supabase.functions.invoke('ai', { body: { mode, payload } });
