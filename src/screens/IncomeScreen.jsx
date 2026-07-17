@@ -22,7 +22,7 @@ export default function IncomeScreen({ transactions, kind, onKind, onAddIncome }
           <>
             <div className="mini-hero">
               <div>
-                <div className="k"><span className="dt w"></span>이번 달 미용실 매출</div>
+                <div className="k">이번 달 미용실 매출</div>
                 <div className="v num pos">{fmt(tot)}<span style={{ fontSize: 15, color: 'var(--fg-2)' }}>원</span></div>
               </div>
               <div className="r">현금 <b className="num">{fmt(cash)}</b><br />카드 <b className="num">{fmt(card)}</b></div>
@@ -33,7 +33,7 @@ export default function IncomeScreen({ transactions, kind, onKind, onAddIncome }
           <>
             <div className="mini-hero">
               <div>
-                <div className="k"><span className="dt h"></span>이번 달 급여</div>
+                <div className="k">이번 달 급여</div>
                 <div className="v num pos">{fmt(tot)}<span style={{ fontSize: 15, color: 'var(--fg-2)' }}>원</span></div>
               </div>
               <div className="r">남편<br /><b>실수령</b></div>

@@ -66,9 +66,9 @@ export default function RecordsScreen({ transactions, budgets, onDelete }) {
 
         <div className="filterbar" style={{ marginTop: 8 }}>
           <div className="fchips">
-            {PERSONS.map(([label, val, cls]) => (
+            {PERSONS.map(([label, val]) => (
               <button key={val} className={`fchip ${person === val ? 'on' : ''}`} onClick={() => { setPerson(val); setDay(null); }}>
-                {cls && <span className={`dt ${cls}`} style={{ marginRight: 4 }}></span>}{label}
+                {label}
               </button>
             ))}
           </div>
