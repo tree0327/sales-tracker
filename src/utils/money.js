@@ -28,12 +28,13 @@ export function computeFinal({ flow, category, method, amount }) {
   return n;
 }
 
-// 거래 수정 시 DB에 보낼 패치. addTransaction 의 payload 규칙과 동일하게 final 을 재계산한다.
+// 거래 수정 시 DB에 보낼 패치. addTransaction 의 payload 규칙과 동일해야 한다
+// — final 재계산과 급여→계좌 강제 둘 다. 어긋나면 추가와 수정의 결과가 갈린다.
 export function buildUpdatePatch({ flow, category, method, amount, memo, date }) {
   return {
     amount: Number(amount) || 0,
     final: computeFinal({ flow, category, method, amount }),
-    method,
+    method: flow === 'income' && category === '급여' ? '계좌' : method,
     memo: (memo || '').trim(),
     date,
   };

@@ -54,4 +54,20 @@ describe('buildUpdatePatch', () => {
     expect(patch.final).toBe(0);
     expect(patch.memo).toBe('');
   });
+
+  it('급여는 결제수단을 계좌로 강제한다 (addTransaction 과 동일 규칙)', () => {
+    const patch = buildUpdatePatch({
+      flow: 'income', category: '급여', method: '카드',
+      amount: 3000000, memo: '7월 월급', date: '2026-07-15T03:00:00Z',
+    });
+    expect(patch.method).toBe('계좌');
+  });
+
+  it('매출은 결제수단을 그대로 둔다', () => {
+    const patch = buildUpdatePatch({
+      flow: 'income', category: '매출', method: '카드',
+      amount: 100000, memo: '', date: '2026-07-16T03:00:00Z',
+    });
+    expect(patch.method).toBe('카드');
+  });
 });
