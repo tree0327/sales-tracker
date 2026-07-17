@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { monthlyFlow, byCategory, signedAmount, expenseByOwner, groupByDay, budgetMap, lastNMonths, monthlyTrend } from './ledger';
+import { monthlyFlow, byCategory, signedAmount, expenseByOwner, groupByDay, budgetMap, lastNMonths, monthlyTrend, jointBalance, jointContributions } from './ledger';
 
 const tx = (o) => ({ method: '카드', ...o });
 
@@ -65,6 +65,23 @@ describe('ledger', () => {
     expect(r).toHaveLength(6);
     expect(r[0]).toMatchObject({ year: 2026, month: 2, label: '2월' });
     expect(r[5]).toMatchObject({ year: 2026, month: 7, label: '7월' });
+  });
+
+  it('jointBalance: 충전 − 공금지출 = 잔고, 충전은 수입/지출에 안 잡힘', () => {
+    const transactions = [
+      tx({ flow: 'transfer', owner: 'wife', amount: 200000 }),
+      tx({ flow: 'transfer', owner: 'husband', amount: 300000 }),
+      tx({ flow: 'expense', owner: 'joint', category: '생활', amount: 120000 }),
+      tx({ flow: 'expense', owner: 'wife', category: '쇼핑', amount: 50000 }),
+      tx({ flow: 'income', owner: 'husband', category: '급여', amount: 3000000, final: 3000000 }),
+    ];
+    const jb = jointBalance(transactions);
+    expect(jb).toEqual({ deposits: 500000, spent: 120000, balance: 380000 });
+    expect(jointContributions(transactions)).toEqual({ wife: 200000, husband: 300000 });
+    // 충전(transfer)은 전체 흐름에 중립: 수입엔 급여만, 지출엔 실지출만
+    const f = monthlyFlow(transactions, []);
+    expect(f.income).toBe(3000000);
+    expect(f.expense).toBe(170000); // 공금지출 120000 + 아내 50000
   });
 
   it('monthlyTrend: 월별 수입/지출/미용실매출 합계', () => {

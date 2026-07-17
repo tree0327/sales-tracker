@@ -22,6 +22,7 @@ export default function RecordsScreen({ transactions, budgets, onDelete }) {
   const shiftMonth = (dir) => { let m = month + dir; if (m < 1) m = 12; if (m > 12) m = 1; setMonth(m); setDay(null); };
 
   const filtered = transactions.filter((t) =>
+    t.flow !== 'transfer' &&
     isSameMonth(t, month, year) &&
     (type === '전체' || t.flow === type) &&
     (person === '전체' || t.owner === person) &&

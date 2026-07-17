@@ -44,13 +44,18 @@ function Shell({ onClose, children }) {
 
 // 입력 시트. mode='tx'(거래) | 'fixed'(고정지출).
 // 부모가 key={openKey} 로 리마운트시켜 매번 초기화한다.
-export default function InputSheet({ mode, preset, categories, member, onClose, onSaveTx, onSaveFixed, notify }) {
-  const [tx, setTx] = useState(() => (mode === 'fixed' ? null : buildTx(preset, member.role)));
+export default function InputSheet({ mode, preset, categories, member, onClose, onSaveTx, onSaveFixed, onSaveTransfer, notify }) {
+  const [tx, setTx] = useState(() => (mode === 'tx' ? buildTx(preset, member.role) : null));
   const [fx, setFx] = useState(() => (mode === 'fixed' ? { name: '', amount: '', method: '계좌' } : null));
+  const [tr, setTr] = useState(() => (mode === 'transfer' ? { amount: '', who: member.role === 'joint' ? 'wife' : member.role, method: '계좌', memo: '', date: '오늘' } : null));
 
-  const draft = mode === 'fixed' ? fx : tx;
+  const draft = mode === 'fixed' ? fx : mode === 'transfer' ? tr : tx;
   const amt = draft.amount ? parseInt(draft.amount, 10) : 0;
-  const setAmount = (next) => (mode === 'fixed' ? setFx({ ...fx, amount: next }) : setTx({ ...tx, amount: next }));
+  const setAmount = (next) => {
+    if (mode === 'fixed') setFx({ ...fx, amount: next });
+    else if (mode === 'transfer') setTr({ ...tr, amount: next });
+    else setTx({ ...tx, amount: next });
+  };
   const pressKey = (k) => {
     let a = draft.amount;
     if (k === '⌫') a = a.slice(0, -1);
@@ -79,6 +84,38 @@ export default function InputSheet({ mode, preset, categories, member, onClose, 
         ))}</div>
         <Keypad onKey={pressKey} />
         <button className="save" onClick={saveFixed}>고정지출 저장</button>
+      </Shell>
+    );
+  }
+
+  // ---- 공금 충전 폼 ----
+  if (mode === 'transfer') {
+    const saveTr = () => {
+      if (!amt) return notify('금액을 입력해주세요');
+      onSaveTransfer({ amount: amt, who: tr.who, method: tr.method, memo: tr.memo, date: dateFromOpt(tr.date) });
+    };
+    return (
+      <Shell onClose={onClose}>
+        <div className="field-lab" style={{ marginTop: 4 }}>공금 충전 · 누가 넣나요?</div>
+        <div className="who">
+          {[{ key: 'wife', label: '아내', cls: 'w' }, { key: 'husband', label: '남편', cls: 'h' }].map((w) => (
+            <button key={w.key} className={`w2 ${tr.who === w.key ? 'on ' + w.cls : ''}`} onClick={() => setTr({ ...tr, who: w.key })}>{w.label}</button>
+          ))}
+        </div>
+        <div className="amt-disp"><div className={`big num ${amt ? '' : 'zero'}`}>{amt ? fmt(amt) : '0'}<span className="cur"> 원</span></div></div>
+        <Quick opts={[['+5만', 50000], ['+10만', 100000], ['+50만', 500000], ['+100만', 1000000]]} onAdd={addAmt} />
+        <div className="field-lab">수단</div>
+        <div className="chips">{['계좌', '현금', '카드'].map((m) => (
+          <button key={m} className={`chip ${tr.method === m ? 'on' : ''}`} onClick={() => setTr({ ...tr, method: m })}>{m}</button>
+        ))}</div>
+        <div className="field-lab">날짜</div>
+        <div className="chips">{DATE_OPTS.map((d) => (
+          <button key={d} className={`chip ${tr.date === d ? 'on' : ''}`} onClick={() => setTr({ ...tr, date: d })}>{d}</button>
+        ))}</div>
+        <div className="field-lab">메모 (선택)</div>
+        <input className="memo-input" placeholder="예: 이번 달 생활비 이체" value={tr.memo} onChange={(e) => setTr({ ...tr, memo: e.target.value })} />
+        <Keypad onKey={pressKey} />
+        <button className="save" onClick={saveTr}>공금 충전</button>
       </Shell>
     );
   }

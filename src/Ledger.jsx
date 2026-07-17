@@ -2,7 +2,7 @@ import { useState, useRef, useCallback } from 'react';
 import { supabase } from './supabaseClient';
 import { resolveMember } from './lib/members';
 import { useLedger } from './hooks/useLedger';
-import { monthlyFlow, isSameMonth, budgetMap, OVERALL, byCategory, sumFinal, sumAmount, incomeList, expenseList } from './utils/ledger';
+import { monthlyFlow, isSameMonth, budgetMap, OVERALL, byCategory, sumFinal, sumAmount, incomeList, expenseList, jointBalance, jointContributions, jointDeposits } from './utils/ledger';
 import HomeScreen from './screens/HomeScreen';
 import ExpenseScreen from './screens/ExpenseScreen';
 import IncomeScreen from './screens/IncomeScreen';
@@ -53,6 +53,7 @@ export default function Ledger({ user }) {
   };
   const openInput = (preset = null) => { setSheetMode('tx'); setSheetPreset(preset); setOpenKey((k) => k + 1); setSheetOpen(true); };
   const openFixed = () => { setSheetMode('fixed'); setSheetPreset(null); setOpenKey((k) => k + 1); setSheetOpen(true); };
+  const openTransfer = () => { setSheetMode('transfer'); setSheetPreset(null); setOpenKey((k) => k + 1); setSheetOpen(true); };
   const closeSheet = () => setSheetOpen(false);
 
   const saveTx = async (payload) => {
@@ -68,6 +69,14 @@ export default function Ledger({ user }) {
     closeSheet();
     if (row) { notify('고정지출 저장!'); setExpenseTab('고정'); setTab('expense'); }
   };
+  const saveTransfer = async (payload) => {
+    const row = await ledger.addTransaction({
+      flow: 'transfer', category: '공금충전', owner: payload.who,
+      method: payload.method, amount: payload.amount, memo: payload.memo, date: payload.date,
+    });
+    closeSheet();
+    if (row) { notify('공금 충전 완료!'); setExpenseTab('joint'); setTab('expense'); }
+  };
   const logout = () => supabase.auth.signOut();
 
   const closeReport = () => {
@@ -81,6 +90,8 @@ export default function Ledger({ user }) {
   const flow = monthlyFlow(monthTx, fixed);
   const bmap = budgetMap(budgets);
   const overallBudget = bmap[OVERALL] || 0;
+  const jointStat = { ...jointBalance(transactions), contrib: jointContributions(transactions) };
+  const deposits = jointDeposits(transactions);
 
   // 지난달 리포트(새 달 첫 접속 · 지난달 데이터 있을 때 1회)
   const lmTx = transactions.filter((t) => isSameMonth(t, lmMonth, lmYear));
@@ -117,7 +128,8 @@ export default function Ledger({ user }) {
       {tab === 'home' && <HomeScreen member={member} flow={flow} monthLabel={MONTH_LABEL} overallBudget={overallBudget} onNav={onNav} onLogout={logout} />}
       {tab === 'expense' && (
         <ExpenseScreen transactions={monthTx} fixed={fixed} activeTab={expenseTab} onTab={setExpenseTab}
-          onNav={onNav} onAddFixed={openFixed} onDeleteFixed={ledger.deleteFixed} />
+          onNav={onNav} onAddFixed={openFixed} onDeleteFixed={ledger.deleteFixed}
+          jointStat={jointStat} deposits={deposits} onDeposit={openTransfer} />
       )}
       {tab === 'income' && <IncomeScreen transactions={monthTx} kind={incomeKind} onKind={setIncomeKind} onAddIncome={openInput} />}
       {tab === 'records' && <RecordsScreen transactions={transactions} budgets={bmap} onDelete={ledger.deleteTransaction} />}
@@ -131,7 +143,8 @@ export default function Ledger({ user }) {
       {report && <MonthlyReport report={report} onClose={closeReport} onSeeAnalysis={seeReportAnalysis} />}
 
       <InputSheet key={openKey} mode={sheetMode} preset={sheetPreset}
-        categories={categories} member={member} onClose={closeSheet} onSaveTx={saveTx} onSaveFixed={saveFixed} notify={notify} />
+        categories={categories} member={member} onClose={closeSheet}
+        onSaveTx={saveTx} onSaveFixed={saveFixed} onSaveTransfer={saveTransfer} notify={notify} />
 
       <div className={`toast${toast ? ' show' : ''}`}>{toast}</div>
     </div>

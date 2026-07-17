@@ -10,6 +10,45 @@ const TABS = [
   { key: 'joint', label: '공금', cls: 'j' },
 ];
 
+function dayLabel(date) {
+  const d = new Date(date);
+  return `${d.getMonth() + 1}/${d.getDate()}`;
+}
+
+function DepositRow({ d }) {
+  const m = MEMBERS[d.owner] || MEMBERS.wife;
+  return (
+    <div className="tx">
+      <div className={`ava ${m.cls}`}>{m.init}</div>
+      <div className="mid"><div className="cat">공금 충전{d.memo ? ` · ${d.memo}` : ''}</div><div className="meta"><span className="pill">{d.method}</span> {dayLabel(d.date)}</div></div>
+      <div className="amt num" style={{ color: 'var(--income)' }}>+{fmt(d.amount)}</div>
+    </div>
+  );
+}
+
+function JointBody({ transactions, jointStat, deposits, onDeposit }) {
+  const recent = deposits.slice(0, 5);
+  return (
+    <>
+      <div className="mini-hero">
+        <div>
+          <div className="k"><span className="dt j"></span>공금 잔고</div>
+          <div className="v num" style={{ color: jointStat.balance >= 0 ? 'var(--ink)' : 'var(--expense)' }}>{fmt(jointStat.balance)}<span style={{ fontSize: 15, color: 'var(--ink-2)' }}>원</span></div>
+        </div>
+        <div className="r">아내 넣음 <b className="num">{fmt(jointStat.contrib.wife)}</b><br />남편 넣음 <b className="num">{fmt(jointStat.contrib.husband)}</b></div>
+      </div>
+      <button className="add-row" onClick={onDeposit}>＋ 공금 충전</button>
+      {recent.length > 0 && (
+        <>
+          <div className="sec-title">최근 충전 <span className="r">{deposits.length}건</span></div>
+          {recent.map((d) => <DepositRow key={d.id} d={d} />)}
+        </>
+      )}
+      <PersonBody transactions={transactions} owner="joint" />
+    </>
+  );
+}
+
 function FixedBody({ fixed, onAddFixed, onDeleteFixed }) {
   return (
     <>
@@ -71,8 +110,8 @@ function PersonBody({ transactions, owner }) {
   );
 }
 
-// 지출관리: 고정 · 아내 · 남편 · 공금
-export default function ExpenseScreen({ transactions, fixed, activeTab, onTab, onNav, onAddFixed, onDeleteFixed }) {
+// 지출관리: 고정 · 아내 · 남편 · 공금(통장)
+export default function ExpenseScreen({ transactions, fixed, activeTab, onTab, onNav, onAddFixed, onDeleteFixed, jointStat, deposits, onDeposit }) {
   return (
     <div>
       <header className="app-head">
@@ -85,9 +124,13 @@ export default function ExpenseScreen({ transactions, fixed, activeTab, onTab, o
             <button key={t.key} className={`s ${t.key === activeTab ? 'on ' + t.cls : ''}`} onClick={() => onTab(t.key)}>{t.label}</button>
           ))}
         </div>
-        {activeTab === '고정'
-          ? <FixedBody fixed={fixed} onAddFixed={onAddFixed} onDeleteFixed={onDeleteFixed} />
-          : <PersonBody transactions={transactions} owner={activeTab} />}
+        {activeTab === '고정' ? (
+          <FixedBody fixed={fixed} onAddFixed={onAddFixed} onDeleteFixed={onDeleteFixed} />
+        ) : activeTab === 'joint' ? (
+          <JointBody transactions={transactions} jointStat={jointStat} deposits={deposits} onDeposit={onDeposit} />
+        ) : (
+          <PersonBody transactions={transactions} owner={activeTab} />
+        )}
       </div>
     </div>
   );

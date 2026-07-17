@@ -33,6 +33,22 @@ export function expenseByOwner(transactions, owner) {
   return expenseList(transactions).filter((t) => t.owner === owner);
 }
 
+// --- 공금 통장(잔고) ---
+// 충전(transfer) − 공금 지출 = 공금 잔고 (누적, 전체 기간).
+export function jointDeposits(transactions) {
+  return transactions.filter((t) => t.flow === 'transfer');
+}
+export function jointBalance(transactions) {
+  const deposits = jointDeposits(transactions).reduce((a, t) => a + num(t.amount), 0);
+  const spent = expenseList(transactions).filter((t) => t.owner === 'joint').reduce((a, t) => a + num(t.amount), 0);
+  return { deposits, spent, balance: deposits - spent };
+}
+export function jointContributions(transactions) {
+  const by = { wife: 0, husband: 0 };
+  for (const t of jointDeposits(transactions)) by[t.owner] = (by[t.owner] || 0) + num(t.amount);
+  return by;
+}
+
 // 카테고리별 합계 (내림차순)
 export function byCategory(list) {
   const map = new Map();
