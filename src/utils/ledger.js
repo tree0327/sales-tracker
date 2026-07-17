@@ -73,3 +73,33 @@ function rank(dayKey) {
   const [m, d] = dayKey.split('/').map((x) => parseInt(x, 10));
   return m * 100 + d;
 }
+
+// --- 예산 ---
+export const OVERALL = '__overall__';
+export function budgetMap(budgets) {
+  const m = {};
+  for (const b of budgets) m[b.scope] = Number(b.amount) || 0;
+  return m;
+}
+
+// --- 월별 추이(분석용) ---
+// base 기준 최근 n개월(오래된→최신) 각 월의 수입/지출/미용실매출 합계.
+export function lastNMonths(base, n) {
+  const out = [];
+  for (let i = n - 1; i >= 0; i--) {
+    const dd = new Date(base.getFullYear(), base.getMonth() - i, 1);
+    out.push({ year: dd.getFullYear(), month: dd.getMonth() + 1, label: `${dd.getMonth() + 1}월` });
+  }
+  return out;
+}
+export function monthlyTrend(transactions, base, n = 6) {
+  return lastNMonths(base, n).map(({ year, month, label }) => {
+    const inM = transactions.filter((t) => isSameMonth(t, month, year));
+    return {
+      year, month, label,
+      income: sumFinal(inM.filter((t) => t.flow === 'income')),
+      expense: sumAmount(inM.filter((t) => t.flow === 'expense')),
+      salon: sumFinal(inM.filter((t) => t.flow === 'income' && t.category === '매출')),
+    };
+  });
+}

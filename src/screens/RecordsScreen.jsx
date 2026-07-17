@@ -2,13 +2,15 @@ import { useState } from 'react';
 import { fmt } from '../utils/money';
 import { isSameMonth, signedAmount, groupByDay } from '../utils/ledger';
 import TxRow from '../components/TxRow';
+import AnalysisView from './AnalysisView';
 
 const TODAY_KEY = (() => { const d = new Date(); return `${d.getMonth() + 1}/${d.getDate()}`; })();
 const dayLabel = (k) => (k === TODAY_KEY ? `오늘 · ${k}` : k);
 
 // 기록: 월 이동 + 필터(종류·소유자·결제수단) + 월별/일별
-export default function RecordsScreen({ transactions, onDelete }) {
+export default function RecordsScreen({ transactions, budgets, onDelete }) {
   const now = new Date();
+  const [mode, setMode] = useState('기록');       // 기록 | 분석
   const [month, setMonth] = useState(now.getMonth() + 1);
   const [type, setType] = useState('전체');       // 전체 | income | expense
   const [person, setPerson] = useState('전체');   // 전체 | wife | husband | joint
@@ -47,6 +49,15 @@ export default function RecordsScreen({ transactions, onDelete }) {
       </header>
       <div className="body">
         <div className="seg">
+          <button className={`s ${mode === '기록' ? 'on' : ''}`} onClick={() => setMode('기록')}>기록</button>
+          <button className={`s ${mode === '분석' ? 'on' : ''}`} onClick={() => setMode('분석')}>분석</button>
+        </div>
+
+        {mode === '분석' ? (
+          <AnalysisView transactions={transactions} month={month} year={year} budgets={budgets} />
+        ) : (
+        <>
+        <div className="seg" style={{ marginTop: 8 }}>
           {TYPES.map(([label, val]) => (
             <button key={val} className={`s ${type === val ? 'on' : ''}`} onClick={() => { setType(val); setDay(null); }}>{label}</button>
           ))}
@@ -100,6 +111,8 @@ export default function RecordsScreen({ transactions, onDelete }) {
         {gran === '일별'
           ? (activeDay && <DayGroup group={groups.find((g) => g.day === activeDay)} onDelete={onDelete} />)
           : groups.map((g) => <DayGroup key={g.day} group={g} onDelete={onDelete} />)}
+        </>
+        )}
       </div>
     </div>
   );

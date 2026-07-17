@@ -9,6 +9,31 @@ function FlowRow({ mk, label, value, cls }) {
   );
 }
 
+function BudgetGauge({ used, budget }) {
+  const ratio = used / budget;
+  const pct = Math.round(ratio * 100);
+  const over = used > budget;
+  const near = !over && ratio >= 0.8;
+  const color = over ? 'var(--expense)' : near ? 'var(--brand)' : 'var(--income)';
+  return (
+    <div className="central" style={{ marginTop: 11, padding: '16px 18px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+        <span className="cap">이번 달 예산</span>
+        <span className="num" style={{ fontWeight: 800, color }}>{pct}%</span>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, fontSize: 13, fontWeight: 700 }}>
+        <span className="num">{fmt(used)}원 사용</span>
+        <span className="num" style={{ color: 'var(--ink-3)' }}>/ {fmt(budget)}원</span>
+      </div>
+      <div style={{ height: 9, marginTop: 10, background: 'var(--surface-2)', borderRadius: 999, overflow: 'hidden' }}>
+        <i style={{ display: 'block', height: '100%', width: `${Math.min(100, pct)}%`, background: color, borderRadius: 999 }} />
+      </div>
+      {over && <div style={{ marginTop: 8, fontSize: 12, fontWeight: 700, color: 'var(--expense)' }}>예산을 {fmt(used - budget)}원 초과했어요</div>}
+      {near && <div style={{ marginTop: 8, fontSize: 12, fontWeight: 700, color: 'var(--brand-ink)' }}>예산의 {pct}%를 썼어요</div>}
+    </div>
+  );
+}
+
 function MenuCard({ icon, iconCls, name, amount, color, onClick }) {
   return (
     <button className="menu-card" onClick={onClick}>
@@ -19,7 +44,7 @@ function MenuCard({ icon, iconCls, name, amount, color, onClick }) {
 }
 
 // 홈: 현재 잔액(랜딩) + 흐름 계산 + 대메뉴
-export default function HomeScreen({ member, flow, monthLabel, onNav, onLogout }) {
+export default function HomeScreen({ member, flow, monthLabel, overallBudget, onNav, onLogout }) {
   const b = flow.balance;
   return (
     <div>
@@ -47,6 +72,8 @@ export default function HomeScreen({ member, flow, monthLabel, onNav, onLogout }
             </div>
           </div>
         </div>
+
+        {overallBudget > 0 && <BudgetGauge used={flow.expense} budget={overallBudget} />}
 
         <MenuCard icon="⟳" iconCls="fx-ic" name="고정지출" amount={`−${fmt(flow.fixed)}원`} color="var(--expense)" onClick={() => onNav('expense', '고정')} />
         <MenuCard icon="−" iconCls="ex-ic" name="지출관리" amount={`−${fmt(flow.expense)}원`} color="var(--expense)" onClick={() => onNav('expense', 'joint')} />

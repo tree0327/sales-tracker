@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { supabase, TX_TABLE, FIXED_TABLE, CATEGORY_TABLE } from '../supabaseClient';
+import { supabase, TX_TABLE, FIXED_TABLE, CATEGORY_TABLE, BUDGET_TABLE } from '../supabaseClient';
 import { computeFinal } from '../utils/money';
 
 // 부부 가계부 데이터 계층.
@@ -9,18 +9,20 @@ export function useLedger() {
   const [transactions, setTransactions] = useState([]);
   const [fixed, setFixed] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [budgets, setBudgets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [needsSetup, setNeedsSetup] = useState(false);
 
   const reload = useCallback(async () => {
     setLoading(true);
-    const [tx, fx, cat] = await Promise.all([
+    const [tx, fx, cat, bud] = await Promise.all([
       supabase.from(TX_TABLE).select('*').order('date', { ascending: false }),
       supabase.from(FIXED_TABLE).select('*').order('amount', { ascending: false }),
       supabase.from(CATEGORY_TABLE).select('*').order('sort', { ascending: true }),
+      supabase.from(BUDGET_TABLE).select('*'),
     ]);
-    // 테이블이 없으면(마이그레이션 전) 설정 안내
+    // 핵심 3개 테이블이 없으면(마이그레이션 전) 설정 안내. budgets(0007)는 없어도 무시.
     if (missingTable(tx.error) || missingTable(fx.error) || missingTable(cat.error)) {
       setNeedsSetup(true);
       setLoading(false);
@@ -32,6 +34,7 @@ export function useLedger() {
     setTransactions(tx.data ?? []);
     setFixed(fx.data ?? []);
     setCategories(cat.data ?? []);
+    setBudgets(missingTable(bud.error) ? [] : (bud.data ?? []));
     setLoading(false);
   }, []);
 
@@ -102,9 +105,22 @@ export function useLedger() {
     if (e) { setError(e.message); setCategories(snap); }
   }, [categories]);
 
+  // --- 월 예산 (scope: '__overall__' 또는 카테고리명) ---
+  const setBudget = useCallback(async (scope, amount) => {
+    const val = Number(amount) || 0;
+    if (val <= 0) {
+      setBudgets((prev) => prev.filter((b) => b.scope !== scope));
+      await supabase.from(BUDGET_TABLE).delete().eq('scope', scope);
+      return;
+    }
+    const { data, error: e } = await supabase.from(BUDGET_TABLE).upsert({ scope, amount: val }, { onConflict: 'scope' }).select().single();
+    if (e) { setError(e.message); return; }
+    setBudgets((prev) => [...prev.filter((b) => b.scope !== scope), data]);
+  }, []);
+
   return {
-    transactions, fixed, categories, loading, error, needsSetup,
-    reload, addTransaction, deleteTransaction, addFixed, deleteFixed, addCategory, deleteCategory,
+    transactions, fixed, categories, budgets, loading, error, needsSetup,
+    reload, addTransaction, deleteTransaction, addFixed, deleteFixed, addCategory, deleteCategory, setBudget,
   };
 }
 

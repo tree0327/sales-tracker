@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { monthlyFlow, byCategory, signedAmount, expenseByOwner, groupByDay } from './ledger';
+import { monthlyFlow, byCategory, signedAmount, expenseByOwner, groupByDay, budgetMap, lastNMonths, monthlyTrend } from './ledger';
 
 const tx = (o) => ({ method: '카드', ...o });
 
@@ -51,5 +51,32 @@ describe('ledger', () => {
     const g = groupByDay(list);
     expect(g[0].day).toBe('7/17');
     expect(g[1].day).toBe('7/15');
+  });
+
+  it('budgetMap: scope→amount 맵', () => {
+    const m = budgetMap([{ scope: '__overall__', amount: 900000 }, { scope: '식비', amount: 300000 }]);
+    expect(m['__overall__']).toBe(900000);
+    expect(m['식비']).toBe(300000);
+    expect(m['없음']).toBeUndefined();
+  });
+
+  it('lastNMonths: base 기준 최근 n개월(오래된→최신)', () => {
+    const r = lastNMonths(new Date(2026, 6, 15), 6); // 7월 기준
+    expect(r).toHaveLength(6);
+    expect(r[0]).toMatchObject({ year: 2026, month: 2, label: '2월' });
+    expect(r[5]).toMatchObject({ year: 2026, month: 7, label: '7월' });
+  });
+
+  it('monthlyTrend: 월별 수입/지출/미용실매출 합계', () => {
+    const transactions = [
+      tx({ flow: 'income', category: '급여', amount: 3000000, final: 3000000, date: '2026-07-10T03:00:00Z' }),
+      tx({ flow: 'income', category: '매출', amount: 100000, final: 90000, date: '2026-07-11T03:00:00Z' }),
+      tx({ flow: 'expense', category: '식비', amount: 50000, date: '2026-07-12T03:00:00Z' }),
+      tx({ flow: 'expense', category: '식비', amount: 10000, date: '2026-06-12T03:00:00Z' }),
+    ];
+    const r = monthlyTrend(transactions, new Date(2026, 6, 1), 6);
+    const jul = r[5];
+    expect(jul).toMatchObject({ month: 7, income: 3090000, expense: 50000, salon: 90000 });
+    expect(r[4].expense).toBe(10000); // 6월
   });
 });

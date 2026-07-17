@@ -1,9 +1,22 @@
 import { useState } from 'react';
+import { OVERALL } from '../utils/ledger';
 
 const INC_CATS = ['매출', '급여', '기타수입'];
 
-// 설정: 지출 카테고리 추가/삭제, 계정/로그아웃
-export default function SettingsScreen({ categories, member, onNav, onAddCategory, onDeleteCategory, onLogout }) {
+function BudgetInput({ label, value, onSave }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid var(--line-2)' }}>
+      <span style={{ flex: 1, fontSize: 13.5, fontWeight: 600 }}>{label}</span>
+      <input className="memo-input" style={{ width: 130, textAlign: 'right', padding: '9px 12px' }}
+        type="number" inputMode="numeric" defaultValue={value || ''} placeholder="0"
+        onBlur={(e) => onSave(e.target.value)} />
+      <span style={{ fontSize: 12, color: 'var(--ink-3)' }}>원</span>
+    </div>
+  );
+}
+
+// 설정: 월 예산, 지출 카테고리 추가/삭제, 계정/로그아웃
+export default function SettingsScreen({ categories, budgets, member, onNav, onSetBudget, onAddCategory, onDeleteCategory, onLogout }) {
   const [name, setName] = useState('');
   const add = () => {
     const v = name.trim();
@@ -17,6 +30,15 @@ export default function SettingsScreen({ categories, member, onNav, onAddCategor
         <button className="title" onClick={() => onNav('home')}><span className="chev">‹</span> 설정</button>
       </header>
       <div className="body">
+        <div className="set-card">
+          <h3>월 예산</h3>
+          <p className="desc">이번 달 변동지출 예산이에요. 홈에 사용률 게이지로 표시됩니다. (0 또는 비우면 해제)</p>
+          <BudgetInput label="전체 예산" value={budgets[OVERALL]} onSave={(v) => onSetBudget(OVERALL, v)} />
+          {categories.map((c) => (
+            <BudgetInput key={c.id} label={c.name} value={budgets[c.name]} onSave={(v) => onSetBudget(c.name, v)} />
+          ))}
+        </div>
+
         <div className="set-card">
           <h3>지출 카테고리 관리</h3>
           <p className="desc">입력할 때 고를 지출 카테고리예요. ×로 지우고, 아래에서 추가하세요.</p>

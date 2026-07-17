@@ -19,3 +19,4 @@ export const RECORDS_TABLE = 'sales_records';
 export const TX_TABLE = 'transactions';
 export const FIXED_TABLE = 'fixed_expenses';
 export const CATEGORY_TABLE = 'expense_categories';
+export const BUDGET_TABLE = 'budgets';
