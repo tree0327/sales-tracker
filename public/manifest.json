@@ -3,7 +3,7 @@
   "name": "부부 가계부",
   "icons": [
     {
-      "src": "favicon.png",
+      "src": "favicon-192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
@@ -11,6 +11,11 @@
       "src": "favicon.png",
       "type": "image/png",
       "sizes": "512x512"
+    },
+    {
+      "src": "favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
     }
   ],
   "start_url": ".",
