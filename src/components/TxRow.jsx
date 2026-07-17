@@ -20,12 +20,12 @@ export default function TxRow({ tx, onDelete, showCategory = true }) {
         <div className="cat">
           {title}
           {tx.memo && showCategory && (
-            <span style={{ fontSize: 11, color: 'var(--ink-3)', fontWeight: 600 }}> · {tx.category}</span>
+            <span style={{ fontSize: 11, color: 'var(--fg-3)', fontWeight: 500 }}> · {tx.category}</span>
           )}
         </div>
         <div className="meta"><span className="pill">{tx.method}</span> {dayLabel(tx.date)}{cardSalonNote}</div>
       </div>
-      <div className="amt num" style={{ color: isIncome ? 'var(--income)' : 'var(--ink)' }}>
+      <div className={`amt num ${isIncome ? 'pos' : 'calm'}`}>
         {isIncome ? '+' : '−'}{fmt(amount)}
       </div>
       {onDelete && <button className="del" aria-label="삭제" onClick={() => onDelete(tx.id)}>×</button>}

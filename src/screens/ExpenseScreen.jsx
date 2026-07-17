@@ -21,7 +21,7 @@ function DepositRow({ d }) {
     <div className="tx">
       <div className={`ava ${m.cls}`}>{m.init}</div>
       <div className="mid"><div className="cat">공금 충전{d.memo ? ` · ${d.memo}` : ''}</div><div className="meta"><span className="pill">{d.method}</span> {dayLabel(d.date)}</div></div>
-      <div className="amt num" style={{ color: 'var(--income)' }}>+{fmt(d.amount)}</div>
+      <div className="amt num pos">+{fmt(d.amount)}</div>
     </div>
   );
 }
@@ -33,7 +33,7 @@ function JointBody({ transactions, jointStat, deposits, onDeposit }) {
       <div className="mini-hero">
         <div>
           <div className="k">공금 잔고</div>
-          <div className="v num" style={{ color: jointStat.balance >= 0 ? 'var(--ink)' : 'var(--expense)' }}>{fmt(jointStat.balance)}<span style={{ fontSize: 15, color: 'var(--ink-2)' }}>원</span></div>
+          <div className={`v num ${jointStat.balance >= 0 ? 'calm' : 'neg'}`}>{fmt(jointStat.balance)}<span style={{ fontSize: 15, color: 'var(--fg-2)' }}>원</span></div>
         </div>
         <div className="r">아내 넣음 <b className="num">{fmt(jointStat.contrib.wife)}</b><br />남편 넣음 <b className="num">{fmt(jointStat.contrib.husband)}</b></div>
       </div>
@@ -54,8 +54,8 @@ function FixedBody({ fixed, onAddFixed, onDeleteFixed }) {
     <>
       <div className="mini-hero">
         <div>
-          <div className="k"><span className="mk fx" style={{ width: 20, height: 20, borderRadius: 6, fontSize: 12 }}>−</span>매달 고정지출 합계</div>
-          <div className="v neg num">−{fmt(fixedTotal(fixed))}<span style={{ fontSize: 15, color: 'var(--ink-2)' }}>원</span></div>
+          <div className="k"><span className="mk fx" style={{ width: 20, height: 20, borderRadius: 'var(--r-sm)', fontSize: 12 }}>−</span>매달 고정지출 합계</div>
+          <div className="v neg num">−{fmt(fixedTotal(fixed))}<span style={{ fontSize: 15, color: 'var(--fg-2)' }}>원</span></div>
         </div>
         <div className="r">매월 1일<br /><b>자동 반영</b></div>
       </div>
@@ -65,7 +65,7 @@ function FixedBody({ fixed, onAddFixed, onDeleteFixed }) {
         <div className="tx" key={f.id}>
           <div className="ava fx">{f.name.slice(0, 1)}</div>
           <div className="mid"><div className="cat">{f.name}</div><div className="meta">매월 {f.day}일 · {f.method}</div></div>
-          <div className="amt num" style={{ color: 'var(--ink)' }}>−{fmt(f.amount)}</div>
+          <div className="amt num calm">−{fmt(f.amount)}</div>
           <button className="del" aria-label="삭제" onClick={() => onDeleteFixed(f.id)}>×</button>
         </div>
       ))}
@@ -80,13 +80,13 @@ function PersonBody({ transactions, owner }) {
   const m = MEMBERS[owner];
   const cats = byCategory(list);
   const max = cats.length ? cats[0].amount : 1;
-  const barColor = m.cls === 'w' ? 'var(--wife)' : m.cls === 'h' ? 'var(--husband)' : 'var(--joint)';
+  const barColor = 'var(--fg)'; // 막대 길이가 이미 크기를 표현하므로 소유자별 색 구분 없이 단색
   return (
     <>
       <div className="mini-hero">
         <div>
           <div className="k">{m.name} · 이번 달 사용</div>
-          <div className="v num">{fmt(tot)}<span style={{ fontSize: 15, color: 'var(--ink-2)' }}>원</span></div>
+          <div className="v num">{fmt(tot)}<span style={{ fontSize: 15, color: 'var(--fg-2)' }}>원</span></div>
         </div>
         <div className="r">변동지출<br /><b>합계</b></div>
       </div>

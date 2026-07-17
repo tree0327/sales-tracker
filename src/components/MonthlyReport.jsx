@@ -12,7 +12,7 @@ export default function MonthlyReport({ report, onClose, onSeeAnalysis }) {
 
         <div className="report-row"><span>수입</span><b className="pos num">+{fmt(income)}원</b></div>
         <div className="report-row"><span>지출</span><b className="num">−{fmt(expense)}원</b></div>
-        {salon > 0 && <div className="report-row"><span>미용실 매출</span><b className="num" style={{ color: 'var(--wife)' }}>{fmt(salon)}원</b></div>}
+        {salon > 0 && <div className="report-row"><span>미용실 매출</span><b className="num pos">{fmt(salon)}원</b></div>}
         <div className="report-row total">
           <span>수입 − 지출</span>
           <b className={`num ${net >= 0 ? 'pos' : 'neg'}`}>{net >= 0 ? '+' : '−'}{fmt(Math.abs(net))}원</b>

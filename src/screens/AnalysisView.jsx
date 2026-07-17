@@ -23,7 +23,7 @@ function VBars({ data, series, height = 150 }) {
               const bx = gx - totalW / 2 + j * (barW + 3);
               return <rect key={s.k} x={bx} y={y0 - h} width={barW} height={h} rx="3" fill={s.color} />;
             })}
-            <text x={gx} y={y0 + 16} textAnchor="middle" fontSize="11" fill="var(--ink-3)" fontWeight="600">{d.label}</text>
+            <text x={gx} y={y0 + 16} textAnchor="middle" fontSize="11" fill="var(--fg-3)" fontWeight="500">{d.label}</text>
           </g>
         );
       })}
@@ -33,9 +33,9 @@ function VBars({ data, series, height = 150 }) {
 
 function Legend({ items }) {
   return (
-    <div className="ratio-legend" style={{ display: 'flex', gap: 14, fontSize: 11.5, color: 'var(--ink-2)', fontWeight: 600, marginTop: 4 }}>
+    <div className="ratio-legend" style={{ display: 'flex', gap: 16, fontSize: 12, color: 'var(--fg-2)', fontWeight: 500, marginTop: 4 }}>
       {items.map((it) => (
-        <span key={it.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+        <span key={it.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
           <span style={{ width: 10, height: 10, borderRadius: 3, background: it.color, display: 'inline-block' }} />{it.label}
         </span>
       ))}
@@ -61,13 +61,12 @@ export default function AnalysisView({ transactions, month, year, budgets }) {
           const budget = budgets[c.name] || 0;
           const ratio = budget ? c.amount / budget : c.amount / maxCat;
           const over = budget && c.amount > budget;
-          const near = budget && !over && ratio >= 0.8;
-          const color = budget ? (over ? 'var(--expense)' : near ? 'var(--brand)' : 'var(--income)') : 'var(--joint)';
+          const color = over ? 'var(--err-fg)' : 'var(--fg)';
           return (
             <div className="cbar" key={c.name}>
               <div className="cb-top">
                 <span>{c.name}</span>
-                <b className="num">{fmt(c.amount)}원{budget ? <span style={{ color: 'var(--ink-3)', fontWeight: 600 }}> / {fmt(budget)}</span> : null}</b>
+                <b className="num">{fmt(c.amount)}원{budget ? <span style={{ color: 'var(--fg-3)', fontWeight: 500 }}> / {fmt(budget)}</span> : null}</b>
               </div>
               <div className="track"><i style={{ width: `${Math.min(100, Math.round(ratio * 100))}%`, background: color }} /></div>
             </div>
@@ -76,17 +75,17 @@ export default function AnalysisView({ transactions, month, year, budgets }) {
       </div>
 
       <div className="sec-title" style={{ marginTop: 22 }}>최근 6개월 수입·지출</div>
-      <div className="mini-hero" style={{ display: 'block', padding: '14px 12px 8px' }}>
-        <VBars data={trend} series={[{ k: 'income', color: 'var(--income)' }, { k: 'expense', color: 'var(--expense)' }]} />
-        <Legend items={[{ label: '수입', color: 'var(--income)' }, { label: '지출', color: 'var(--expense)' }]} />
+      <div className="mini-hero" style={{ display: 'block', padding: '16px 12px 8px' }}>
+        <VBars data={trend} series={[{ k: 'income', color: 'var(--ok-fg)' }, { k: 'expense', color: 'var(--err-fg)' }]} />
+        <Legend items={[{ label: '수입', color: 'var(--ok-fg)' }, { label: '지출', color: 'var(--err-fg)' }]} />
       </div>
 
       {hasSalon && (
         <>
           <div className="sec-title" style={{ marginTop: 22 }}>미용실 매출 추이 <span className="r">최근 6개월</span></div>
-          <div className="mini-hero" style={{ display: 'block', padding: '14px 12px 8px' }}>
-            <VBars data={trend} series={[{ k: 'salon', color: 'var(--wife)' }]} height={130} />
-            <Legend items={[{ label: '미용실 매출', color: 'var(--wife)' }]} />
+          <div className="mini-hero" style={{ display: 'block', padding: '16px 12px 8px' }}>
+            <VBars data={trend} series={[{ k: 'salon', color: 'var(--ok-fg)' }]} height={130} />
+            <Legend items={[{ label: '미용실 매출', color: 'var(--ok-fg)' }]} />
           </div>
         </>
       )}
