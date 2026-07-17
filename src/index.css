@@ -257,24 +257,24 @@ button, input { font-family: inherit; }
 .btn-mini.danger { color: var(--err-fg); }
 
 /* 매출관리 탭 (SalesScreen) */
-.sales-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.sq-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 96px; border: 2px solid var(--fg); border-radius: var(--r-lg); background: var(--bg); color: var(--fg); font-size: 16px; font-weight: 500; cursor: pointer; transition: background-color .15s; }
+.sales-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
+.sq-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; min-height: 112px; border: 2px solid var(--fg); border-radius: var(--r-lg); background: var(--bg); color: var(--fg); font-size: 16px; font-weight: 500; cursor: pointer; transition: background-color .15s; }
 .sq-btn:hover { background: var(--fill); }
-.sq-icon { font-size: 28px; line-height: 1; }
-.sales-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+.sq-icon { font-size: 32px; line-height: 1; }
+.sales-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px; }
 .sum-card { border: 2px solid var(--fg); border-radius: var(--r-lg); padding: 16px; }
 .sum-label { display: block; font-size: 12px; color: var(--fg-2); }
 .sum-label em { color: var(--fg-3); font-style: normal; }
-.sum-value { display: block; margin-top: 4px; font-size: 20px; font-weight: 700; }
+.sum-value { display: block; margin-top: 8px; font-size: 20px; font-weight: 700; }
 .sum-value em { margin-left: 2px; font-size: 12px; font-style: normal; color: var(--fg-2); }
-.sales-total { display: block; width: 100%; text-align: left; margin-top: 16px; border: 2px solid var(--fg); border-radius: var(--r-lg); padding: 24px; background: var(--bg); cursor: pointer; transition: background-color .15s; }
+.sales-total { display: block; width: 100%; text-align: left; margin-top: 24px; border: 2px solid var(--fg); border-radius: var(--r-lg); padding: 24px; background: var(--bg); cursor: pointer; transition: background-color .15s; }
 .sales-total:hover { background: var(--fill); }
 .st-period { display: block; font-size: 12px; color: var(--fg-3); }
-.st-label { display: block; margin-top: 4px; font-size: 14px; color: var(--fg-2); }
-.st-amount { display: block; margin-top: 4px; font-size: 32px; font-weight: 700; letter-spacing: -.02em; }
+.st-label { display: block; margin-top: 8px; font-size: 14px; color: var(--fg-2); }
+.st-amount { display: block; margin-top: 8px; font-size: 32px; font-weight: 700; letter-spacing: -.02em; }
 .st-amount em { margin-left: 4px; font-size: 16px; font-style: normal; color: var(--fg-2); }
-.st-subs { display: block; margin-top: 8px; font-size: 12px; color: var(--fg-2); }
-.st-hint { display: block; margin-top: 8px; font-size: 12px; color: var(--fg-3); }
+.st-subs { display: block; margin-top: 12px; font-size: 12px; color: var(--fg-2); }
+.st-hint { display: block; margin-top: 12px; font-size: 12px; color: var(--fg-3); }
 
 /* 매출관리 탭 정체성 — 가계부 화면들과 구분되는 검정 인버트 헤더.
    현금(주 결제수단)은 검정 채움, 카드는 아웃라인으로 무게 차등. */
@@ -282,3 +282,5 @@ button, input { font-family: inherit; }
 .sales-head .title { color: var(--on-accent); cursor: default; }
 .sq-btn.fill { background: var(--fg); color: var(--on-accent); }
 .sq-btn.fill:hover { background: rgba(23, 23, 23, .85); }
+/* 매출 탭의 '전체 기록 보기'만 섹션 리듬(24px)에 맞춘다 — 다른 화면의 .add-row 는 그대로. */
+.sales-total + .add-row { margin-top: 24px; }
