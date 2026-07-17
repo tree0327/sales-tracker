@@ -1,57 +1,60 @@
-# Supabase 설정 (마지막 2단계 — 직접 진행 필요)
+# Supabase 설정 (부부 가계부 — 직접 진행 필요)
 
-코드는 모두 적용되었습니다. 아래 두 단계만 직접 해주시면 매출 기록이 실제 Supabase DB에 저장됩니다.
-(자동화 도구(MCP)가 이 프로젝트에 대한 테이블 생성/키 조회 권한을 거부하여, 이 두 단계만 수동으로 진행합니다.)
+코드는 모두 적용되었습니다. 아래 단계를 직접 해주시면 실제 DB에 저장되고 로그인이 동작합니다.
 
-## 1단계: 테이블 생성
+## 1단계: 테이블 생성 (SQL 실행)
 
 1. https://supabase.com/dashboard 접속 → 프로젝트 **jvtwxjkfntxnuepkfcuq** 선택
 2. 좌측 **SQL Editor** → **New query**
-3. 저장소의 `supabase/migrations/0001_create_sales_records.sql` 내용을 전부 붙여넣고 **Run**
-   (또는 아래를 그대로 붙여넣기)
+3. 저장소의 `supabase/migrations/0006_household_ledger.sql` 내용을 **전부 붙여넣고 Run**
 
-```sql
-create table if not exists public.sales_records (
-  id text primary key,
-  type text not null,
-  original numeric not null default 0,
-  final numeric not null default 0,
-  name text not null default '',
-  date timestamptz not null default now(),
-  created_at timestamptz not null default now()
-);
-create index if not exists sales_records_date_idx on public.sales_records (date desc);
-alter table public.sales_records enable row level security;
-create policy "public_select_sales_records" on public.sales_records for select to anon, authenticated using (true);
-create policy "public_insert_sales_records" on public.sales_records for insert to anon, authenticated with check (true);
-create policy "public_update_sales_records" on public.sales_records for update to anon, authenticated using (true) with check (true);
-create policy "public_delete_sales_records" on public.sales_records for delete to anon, authenticated using (true);
-```
+이 스크립트가 하는 일:
+- `transactions`(수입·지출), `fixed_expenses`(고정지출), `expense_categories`(지출 카테고리) 생성
+- 로그인 사용자만 접근 가능한 RLS 정책 + 기본 지출 카테고리 시드
+- 기존 `sales_records`(미용실 매출)를 `transactions`(수입/매출/아내)로 **자동 이관**
 
-## 2단계: API 키를 .env.local 에 입력
+## 2단계: 계정 2개 만들기 + 역할 지정
 
-1. 대시보드 → **Settings** → **API**
-2. **Publishable key**(`sb_publishable_...`) 또는 **Project API keys → anon public** 값을 복사
-3. 프로젝트 루트 `.env.local` 파일의 키를 교체:
+부부 각자의 계정을 만듭니다. 가입 화면은 없으니 대시보드에서 직접 생성합니다.
+
+1. 대시보드 → **Authentication → Users → Add user** 로 계정 2개 생성
+   - 아이디만 쓰고 싶으면 이메일을 `wife@home.local`, `husband@home.local` 처럼 만들면
+     로그인 화면에서 `wife` / `husband` 만 입력해도 됩니다. (앱이 `@home.local` 을 붙여줌)
+2. **역할 지정** (둘 중 하나)
+   - **(권장) User metadata**: 각 사용자 편집 → **User Metadata (raw)** 에
+     `{ "role": "wife" }` / `{ "role": "husband" }` 저장
+   - **또는 코드 매핑**: `src/lib/members.js` 의 `EMAIL_ROLE` 에 이메일→역할을 적기
+     ```js
+     const EMAIL_ROLE = {
+       'wife@home.local': 'wife',
+       'husband@home.local': 'husband',
+     };
+     ```
+
+> 역할을 지정하지 않으면 기본값 `wife` 로 처리됩니다(입력 시 자동선택만 영향, 데이터는 공유).
+
+## 3단계: API 키를 .env.local 에 입력
+
+이미 설정돼 있다면 건너뛰세요. 없으면:
+
+1. 대시보드 → **Settings → API**
+2. **Publishable key**(`sb_publishable_...`) 또는 **anon public** 값을 복사
+3. 루트 `.env.local`:
 
 ```
 VITE_SUPABASE_URL=https://jvtwxjkfntxnuepkfcuq.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=<복사한 키>
 ```
 
-## 3단계: 실행 및 확인
+## 4단계: 실행 및 확인
 
 ```
 npm run dev
 ```
 
-- 매출(현금/카드)을 추가 → **새로고침해도 유지**되면 DB 저장 성공입니다.
-- 기존에 localStorage 에 쌓아둔 기록이 있으면, DB가 비어있을 때 **자동으로 1회 업로드**됩니다.
-- Supabase 대시보드 → **Table Editor → sales_records** 에서 실제 행을 확인할 수 있습니다.
+- 만든 계정으로 로그인 → 홈에 **현재 잔액**이 보입니다.
+- `＋` 로 지출/수입을 넣으면 잔액이 즉시 바뀌고, 새로고침해도 유지됩니다.
+- 테이블이 아직 없으면 앱이 "데이터베이스 설정이 필요해요" 안내를 띄웁니다(1단계 실행 필요).
 
-## 참고 (선택): MCP로 자동화하려면
-
-Supabase MCP가 이 프로젝트에 대한 쓰기 작업을 모두 거부하고 있습니다(`permission denied`).
-MCP 토큰/연결이 **read-only** 이거나 프로젝트 범위 권한이 없을 가능성이 큽니다.
-`/mcp` 에서 Supabase를 **쓰기 권한 + 해당 프로젝트 접근**으로 다시 연결하면,
-이후에는 테이블 생성/키 조회/검증을 자동으로 처리할 수 있습니다.
+> AI 챗봇 등 이전 기능(`ai_chat`, Edge Function)은 이번 1차 범위에서 제외되어 화면에 없습니다.
+> 관련 테이블/함수는 지워도 되고 남겨둬도 앱에 영향 없습니다.

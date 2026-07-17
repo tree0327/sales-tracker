@@ -1,6 +1,6 @@
 {
-  "short_name": "매출관리",
-  "name": "매출관리 (모바일 최적화)",
+  "short_name": "부부가계부",
+  "name": "부부 가계부",
   "icons": [
     {
       "src": "favicon.png",
@@ -15,6 +15,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#ffffff",
-  "background_color": "#f2f2f7"
+  "theme_color": "#C8842A",
+  "background_color": "#E4D9C3"
 }
