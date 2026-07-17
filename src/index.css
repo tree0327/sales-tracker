@@ -243,14 +243,16 @@ button, input { font-family: inherit; }
 .modal-sub { display: block; margin-top: 4px; font-size: 12px; font-weight: 400; color: var(--fg-2); }
 .modal-body { margin: 0 0 8px; font-size: 14px; color: var(--fg-2); line-height: 1.6; }
 .rec-list { list-style: none; margin: 0; padding: 0; }
-.rec-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+/* 좁은 화면에서 날짜·이름·뱃지·금액·버튼이 한 줄에 다 안 들어가므로,
+   수정/삭제 버튼(.rec-actions, width 100%)만 둘째 줄로 흘려보낸다. */
+.rec-item { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
 .rec-main { flex: 1; display: flex; align-items: center; gap: 8px; min-width: 0; }
 .rec-when { font-size: 12px; color: var(--fg-3); white-space: nowrap; }
 .rec-name { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .rec-right { text-align: right; }
 .rec-amt { display: block; font-size: 14px; font-weight: 700; }
 .rec-org { display: block; font-size: 12px; color: var(--fg-3); }
-.rec-actions { display: flex; gap: 4px; }
+.rec-actions { display: flex; gap: 8px; width: 100%; justify-content: flex-end; }
 .btn-mini { min-height: 48px; padding: 0 12px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--bg); color: var(--fg-2); font-size: 12px; cursor: pointer; }
 .btn-mini.danger { color: var(--err-fg); }
 

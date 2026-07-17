@@ -29,7 +29,7 @@
 | `--background` | `#ffffff` | `--bg` |
 | `--foreground` | `#171717` | `--fg` |
 | `text-black/60` | `rgba(0,0,0,.6)` | `--fg-2` |
-| `text-black/40` | `rgba(0,0,0,.4)` | `--fg-3` |
+| `text-black/40` | `rgba(0,0,0,.55)` ※AA 미달이라 상향 | `--fg-3` |
 | `border-black/10` | `rgba(0,0,0,.1)` | `--line` |
 | `bg-black/5` | `rgba(0,0,0,.05)` | `--fill` |
 | `bg-black` + `text-white` | `#171717` / `#fff` | `--accent` / `--on-accent` |
@@ -167,8 +167,10 @@ git commit -m "chore: AI 기능 완전 제거 (클라이언트 코드·Edge Func
 
   --bg: #ffffff;
   --fg: #171717;
-  --fg-2: rgba(0, 0, 0, .6);
-  --fg-3: rgba(0, 0, 0, .4);
+  --fg-2: rgba(0, 0, 0, .6);   /* 5.74:1 */
+  /* DESIGN.md §3은 캡션을 black/40~50 으로 규정하지만 흰 배경에서 2.85~3.95:1 로 AA 미달이다.
+     §8의 "black/40 밑으로 내려가지 말 것"(하한)은 지키면서 4.74:1 로 올린 값. 2026-07-17 사용자 승인. */
+  --fg-3: rgba(0, 0, 0, .55);  /* 4.74:1 */
   --line: rgba(0, 0, 0, .1);
   --fill: rgba(0, 0, 0, .05);
 
@@ -418,12 +420,13 @@ Expected: FAIL — `buildUpdatePatch is not a function`
 
 `src/utils/money.js` 끝에 추가:
 ```js
-// 거래 수정 시 DB에 보낼 패치. addTransaction 의 payload 규칙과 동일하게 final 을 재계산한다.
+// 거래 수정 시 DB에 보낼 패치. addTransaction 의 payload 규칙과 동일해야 한다
+// — final 재계산과 급여→계좌 강제 둘 다. 어긋나면 추가와 수정의 결과가 갈린다.
 export function buildUpdatePatch({ flow, category, method, amount, memo, date }) {
   return {
     amount: Number(amount) || 0,
     final: computeFinal({ flow, category, method, amount }),
-    method,
+    method: flow === 'income' && category === '급여' ? '계좌' : method,
     memo: (memo || '').trim(),
     date,
   };
@@ -998,10 +1001,12 @@ git commit -m "feat(sales): 매출관리 독립 탭 복원(예전 입력/기록 
 
 ---
 
-## Task 10: 급여 화면 축소 + 홈 메뉴 카드 분리
+## Task 10: 급여 화면 축소 + 홈 메뉴 카드 분리 + 매출 입력 경로 단일화
 
 **Files:**
-- Modify: `src/screens/IncomeScreen.jsx`, `src/screens/HomeScreen.jsx`, `src/Ledger.jsx`
+- Modify: `src/screens/IncomeScreen.jsx`, `src/screens/HomeScreen.jsx`, `src/Ledger.jsx`, `src/components/InputSheet.jsx`, `src/utils/ledger.js`(+test)
+
+**추가 배경(2026-07-18):** Task 9 완료 시점에 매출 입력 경로가 3개다 — ① 새 매출 탭(주 경로), ② income 탭의 [매출관리·아내] 세그먼트, ③ 가운데 + FAB(InputSheet)의 수입→매출 카테고리. 사용자 요청 "매출관리는 별도 탭으로 · 사용성 고민"에 따라 **①로 단일화**한다. ②는 이 Task의 급여 전용 축소로 사라지고, ③은 InputSheet의 수입 흐름에서 '매출' 카테고리를 제거해 없앤다(지출·급여·기타수입·고정·공금충전은 그대로).
 
 **Interfaces:**
 - Consumes: Task 9의 `'sales'` 탭 키
