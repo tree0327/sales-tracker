@@ -32,7 +32,7 @@ function JointBody({ transactions, jointStat, deposits, onDeposit }) {
     <>
       <div className="mini-hero">
         <div>
-          <div className="k"><span className="dt j"></span>공금 잔고</div>
+          <div className="k">공금 잔고</div>
           <div className="v num" style={{ color: jointStat.balance >= 0 ? 'var(--ink)' : 'var(--expense)' }}>{fmt(jointStat.balance)}<span style={{ fontSize: 15, color: 'var(--ink-2)' }}>원</span></div>
         </div>
         <div className="r">아내 넣음 <b className="num">{fmt(jointStat.contrib.wife)}</b><br />남편 넣음 <b className="num">{fmt(jointStat.contrib.husband)}</b></div>
@@ -85,7 +85,7 @@ function PersonBody({ transactions, owner }) {
     <>
       <div className="mini-hero">
         <div>
-          <div className="k"><span className={`dt ${m.cls}`}></span>{m.name} · 이번 달 사용</div>
+          <div className="k">{m.name} · 이번 달 사용</div>
           <div className="v num">{fmt(tot)}<span style={{ fontSize: 15, color: 'var(--ink-2)' }}>원</span></div>
         </div>
         <div className="r">변동지출<br /><b>합계</b></div>

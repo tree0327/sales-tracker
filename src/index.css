@@ -52,13 +52,8 @@ button, input { font-family: inherit; }
 .mnav { display: inline-flex; align-items: center; gap: 16px; font-weight: 700; font-size: 18px; }
 .mnav button { background: none; border: none; color: var(--fg-3); font-size: 22px; cursor: pointer; padding: 0 4px; }
 .icn { width: 48px; height: 48px; border-radius: var(--r-md); background: var(--bg); border: 1px solid var(--line); display: grid; place-items: center; color: var(--fg-2); font-size: 16px; cursor: pointer; }
-.userchip { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; padding: 8px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); cursor: pointer; min-height: 48px; }
-.userchip .av { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 700; color: var(--on-accent); }
-/* 소유자 색 구분은 Task 3에서 텍스트 뱃지로 대체 예정. 그때까지는 중립 회색으로 눌러 둔다. */
-.userchip.w { color: var(--fg-2); } .userchip.w .av { background: var(--fill); color: var(--fg); }
-.userchip.h { color: var(--fg-2); } .userchip.h .av { background: var(--fill); color: var(--fg); }
-.dt { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-.dt.h { background: var(--fill); } .dt.w { background: var(--fill); } .dt.j { background: var(--accent); }
+.userchip { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; padding: 8px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); color: var(--fg-2); cursor: pointer; min-height: 48px; }
+.userchip .av { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 700; background: var(--fill); color: var(--fg); }
 
 .body { padding: 4px 16px 16px; }
 
@@ -101,7 +96,6 @@ button, input { font-family: inherit; }
 .seg { display: flex; background: var(--fill); border: 1px solid var(--line); border-radius: var(--r-md); padding: 4px; gap: 4px; }
 .seg .s { flex: 1; text-align: center; padding: 12px 4px; border-radius: var(--r-md); font-size: 12px; font-weight: 700; color: var(--fg-2); cursor: pointer; border: none; background: none; min-height: 48px; }
 .seg .s.on { background: var(--bg); color: var(--fg); }
-.seg .s.on.w { background: var(--fill); color: var(--fg); } .seg .s.on.h { background: var(--fill); color: var(--fg); } .seg .s.on.j { background: var(--accent); color: var(--on-accent); }
 .seg .s.on.fx { background: var(--err-fg); color: var(--on-accent); }
 .seg .s.on.ex { background: var(--err-fg); color: var(--on-accent); } .seg .s.on.in { background: var(--ok-fg); color: var(--on-accent); }
 
@@ -123,9 +117,14 @@ button, input { font-family: inherit; }
 
 .tx { display: flex; align-items: center; gap: 12px; padding: 12px 4px; border-bottom: 1px solid var(--line); }
 .tx:last-child { border-bottom: none; }
-.tx .ava { width: 36px; height: 36px; border-radius: var(--r-md); display: grid; place-items: center; font-size: 13px; font-weight: 700; flex: none; }
-.ava.h { background: var(--fill); color: var(--fg); } .ava.w { background: var(--fill); color: var(--fg); }
-.ava.j { background: var(--fill); color: var(--fg); } .ava.fx { background: var(--err-bg); color: var(--err-fg); }
+.tx .ava { width: 36px; height: 36px; border-radius: var(--r-md); display: grid; place-items: center; font-size: 13px; font-weight: 700; flex: none; background: var(--fill); color: var(--fg-2); }
+.ava.fx { background: var(--err-bg); color: var(--err-fg); }
+/* 소유자 표시. 예전에는 색(핑크/블루/앰버)으로 구분했지만, 색만으로 의미를 전달하지 않도록 텍스트 뱃지로 바꿨다(DESIGN.md §8). */
+.owner-badge {
+  display: inline-block; padding: 2px 8px; border-radius: var(--r-sm);
+  background: var(--fill); color: var(--fg-2);
+  font-size: 12px; font-weight: 400; line-height: 1.5; white-space: nowrap;
+}
 .tx .mid { flex: 1; min-width: 0; }
 .tx .mid .cat { font-size: 14px; font-weight: 500; }
 .tx .mid .meta { font-size: 12px; color: var(--fg-3); margin-top: 0; display: flex; align-items: center; gap: 8px; }
@@ -179,8 +178,7 @@ button, input { font-family: inherit; }
 .sheet-open .scrim { opacity: 1; pointer-events: auto; }
 .sheet-open .sheet { transform: translateX(-50%) translateY(0); }
 .grab { width: 40px; height: 4px; border-radius: 999px; background: var(--line); margin: 8px auto 12px; }
-.fixed-owner { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; padding: 8px 12px; border-radius: var(--r-md); margin-top: 4px; }
-.fixed-owner.w { color: var(--fg); background: var(--fill); } .fixed-owner.h { color: var(--fg); background: var(--fill); }
+.fixed-owner { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; padding: 8px 12px; border-radius: var(--r-md); margin-top: 4px; color: var(--fg); background: var(--fill); }
 .amt-disp { text-align: right; padding: 16px 4px 8px; }
 .amt-disp .big { font-size: 42px; font-weight: 700; letter-spacing: -.02em; }
 .amt-disp .big.zero { color: var(--fg-3); }
@@ -196,9 +194,7 @@ button, input { font-family: inherit; }
 .chip.on { background: var(--fill); border-color: var(--accent); color: var(--fg); }
 .who { display: flex; gap: 8px; }
 .who .w2 { flex: 1; text-align: center; padding: 12px; border-radius: var(--r-md); font-size: 13px; font-weight: 700; border: 1.5px solid var(--line); background: var(--fill); color: var(--fg-2); cursor: pointer; }
-.who .w2.on.w { border-color: var(--fg); background: var(--fill); color: var(--fg); }
-.who .w2.on.h { border-color: var(--fg); background: var(--fill); color: var(--fg); }
-.who .w2.on.j { border-color: var(--accent); background: var(--fill); color: var(--fg); }
+.who .w2.on { border-color: var(--fg); background: var(--fill); color: var(--fg); }
 .memo-input { width: 100%; border: 1px solid var(--line); background: var(--fill); border-radius: var(--r-md); padding: 12px 16px; font-size: 14px; color: var(--fg); }
 .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 16px; }
 .key { text-align: center; padding: 16px; font-size: 20px; font-weight: 700; border-radius: var(--r-md); background: var(--fill); border: 1px solid var(--line); cursor: pointer; user-select: none; color: var(--fg); }
