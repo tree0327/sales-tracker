@@ -217,3 +217,22 @@ button, input { font-family: inherit; }
 .report-cats .rc-t { font-size: 12px; font-weight: 700; color: var(--fg-2); margin-bottom: 8px; }
 .report-cats .rc { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; color: var(--fg-2); font-weight: 500; }
 .modal .ghost { margin-top: 8px; width: 100%; padding: 12px; border-radius: var(--r-md); border: none; background: none; color: var(--fg-3); font-weight: 700; font-size: 14px; cursor: pointer; }
+
+/* 매출 입력/수정 모달 (SalesInputModal) 등 폼형 모달 공용 패턴.
+   .modal-scrim 은 위 월말 리포트 모달과 공유(중복 정의 안 함). */
+.modal-card { width: 100%; max-width: 384px; background: var(--bg); border-radius: var(--r-lg); padding: 24px; box-shadow: var(--shadow-sm); max-height: 90dvh; overflow-y: auto; }
+.modal-title { margin: 0 0 16px; font-size: 16px; font-weight: 700; }
+.field { display: block; margin-bottom: 16px; }
+.field-label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; }
+.field input { width: 100%; min-height: 48px; padding: 12px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--bg); color: var(--fg); font-size: 16px; }
+.field-hint { margin: -8px 0 16px; font-size: 12px; color: var(--fg-2); }
+.msg { margin: 0 0 16px; padding: 16px; border-radius: var(--r-md); font-size: 14px; }
+.msg.err { background: var(--err-bg); color: var(--err-fg); }
+.msg.ok { background: var(--ok-bg); color: var(--ok-fg); }
+.modal-actions { display: flex; gap: 12px; margin-top: 24px; }
+.btn-ghost, .btn-primary { flex: 1; min-height: 48px; border-radius: var(--r-md); font-size: 16px; font-weight: 500; cursor: pointer; transition: background-color .15s; }
+.btn-ghost { border: 1px solid var(--line); background: var(--bg); color: var(--fg); }
+.btn-ghost:hover { background: var(--fill); }
+.btn-primary { border: none; background: var(--accent); color: var(--on-accent); }
+.btn-primary:hover { background: rgba(23,23,23,.8); }
+.btn-primary:disabled { opacity: .6; cursor: not-allowed; }
