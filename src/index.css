@@ -119,8 +119,9 @@ button, input { font-family: inherit; }
 .tx:last-child { border-bottom: none; }
 .tx .ava { width: 36px; height: 36px; border-radius: var(--r-md); display: grid; place-items: center; font-size: 13px; font-weight: 700; flex: none; background: var(--fill); color: var(--fg-2); }
 .ava.fx { background: var(--err-bg); color: var(--err-fg); }
-/* 소유자 표시. 예전에는 색(핑크/블루/앰버)으로 구분했지만, 색만으로 의미를 전달하지 않도록 텍스트 뱃지로 바꿨다(DESIGN.md §8). */
-.owner-badge {
+/* 소유자 표시. 예전에는 색(핑크/블루/앰버)으로 구분했지만, 색만으로 의미를 전달하지 않도록 텍스트 뱃지로 바꿨다(DESIGN.md §8).
+   .method-badge 는 결제수단(현금/카드) 전용 — 의미가 다르므로 클래스는 분리하되 무채색 뱃지 모양은 공유한다. */
+.owner-badge, .method-badge {
   display: inline-block; padding: 2px 8px; border-radius: var(--r-sm);
   background: var(--fill); color: var(--fg-2);
   font-size: 12px; font-weight: 400; line-height: 1.5; white-space: nowrap;
@@ -236,3 +237,18 @@ button, input { font-family: inherit; }
 .btn-primary { border: none; background: var(--accent); color: var(--on-accent); }
 .btn-primary:hover { background: rgba(23,23,23,.8); }
 .btn-primary:disabled { opacity: .6; cursor: not-allowed; }
+
+/* 매출 기록 목록 모달 (SalesRecordModal) */
+.modal-sub { display: block; margin-top: 4px; font-size: 12px; font-weight: 400; color: var(--fg-2); }
+.modal-body { margin: 0 0 8px; font-size: 14px; color: var(--fg-2); line-height: 1.6; }
+.rec-list { list-style: none; margin: 0; padding: 0; }
+.rec-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.rec-main { flex: 1; display: flex; align-items: center; gap: 8px; min-width: 0; }
+.rec-when { font-size: 12px; color: var(--fg-3); white-space: nowrap; }
+.rec-name { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rec-right { text-align: right; }
+.rec-amt { display: block; font-size: 14px; font-weight: 700; }
+.rec-org { display: block; font-size: 12px; color: var(--fg-3); }
+.rec-actions { display: flex; gap: 4px; }
+.btn-mini { min-height: 48px; padding: 0 12px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--bg); color: var(--fg-2); font-size: 12px; cursor: pointer; }
+.btn-mini.danger { color: var(--err-fg); }
