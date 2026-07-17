@@ -32,7 +32,6 @@ export default function Ledger({ user }) {
     try { return !!window.localStorage.getItem(reportKey); } catch { return true; }
   });
   const [expenseTab, setExpenseTab] = useState('고정');
-  const [incomeKind, setIncomeKind] = useState('매출');
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetMode, setSheetMode] = useState('tx');   // 'tx' | 'fixed'
@@ -61,7 +60,7 @@ export default function Ledger({ user }) {
     const row = await ledger.addTransaction(payload);
     closeSheet();
     if (row) {
-      notify(`${payload.flow === 'expense' ? '지출' : payload.category === '급여' ? '급여' : payload.category === '매출' ? '매출' : '수입'} 저장!`);
+      notify(`${payload.flow === 'expense' ? '지출' : payload.category === '급여' ? '급여' : '수입'} 저장!`);
       setTab('home');
     }
   };
@@ -144,7 +143,7 @@ export default function Ledger({ user }) {
       {tab === 'sales' && (
         <SalesScreen transactions={transactions} onAdd={addSales} onUpdate={updateSales} onDelete={ledger.deleteTransaction} />
       )}
-      {tab === 'income' && <IncomeScreen transactions={monthTx} kind={incomeKind} onKind={setIncomeKind} onAddIncome={openInput} />}
+      {tab === 'income' && <IncomeScreen transactions={monthTx} onAddIncome={openInput} />}
       {tab === 'records' && <RecordsScreen transactions={transactions} budgets={bmap} onDelete={ledger.deleteTransaction} />}
       {tab === 'settings' && (
         <SettingsScreen categories={categories} budgets={bmap} member={member} onNav={onNav}

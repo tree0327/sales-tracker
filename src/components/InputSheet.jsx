@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { fmt } from '../utils/money';
 
-const INC_CATS = ['매출', '급여', '기타수입'];
+const INC_CATS = ['급여', '기타수입'];
 const WHO = [
   { key: 'wife', label: '아내', cls: 'w' },
   { key: 'joint', label: '공금', cls: 'j' },
@@ -19,8 +19,7 @@ function dateFromOpt(opt) {
 }
 function buildTx(preset, role) {
   const base = { flow: '지출', amount: '', cat: null, who: role, method: '카드', memo: '', date: '오늘', whoAuto: true };
-  if (preset === '매출') Object.assign(base, { flow: '수입', cat: '매출', who: 'wife', method: '현금', whoAuto: false });
-  else if (preset === '급여') Object.assign(base, { flow: '수입', cat: '급여', who: 'husband', method: '계좌', whoAuto: false });
+  if (preset === '급여') Object.assign(base, { flow: '수입', cat: '급여', who: 'husband', method: '계좌', whoAuto: false });
   return base;
 }
 
@@ -122,20 +121,17 @@ export default function InputSheet({ mode, preset, categories, member, onClose, 
 
   // ---- 거래 폼 ----
   const cats = draft.flow === '지출' ? categories.map((c) => c.name) : INC_CATS;
-  const isSalonCard = draft.cat === '매출' && draft.method === '카드';
-  const fee = isSalonCard ? Math.round(amt * 0.1) : 0;
   const isSalary = draft.cat === '급여';
   const showMethod = !isSalary;
-  const methodOpts = draft.cat === '매출' ? ['현금', '카드'] : ['카드', '현금', '계좌'];
+  const methodOpts = ['카드', '현금', '계좌'];
 
   const setFlow = (flow) => {
-    if (flow === '수입') setTx({ ...tx, flow, cat: '매출', who: 'wife', method: '현금', whoAuto: false });
+    if (flow === '수입') setTx({ ...tx, flow, cat: '급여', who: 'husband', method: '계좌', whoAuto: false });
     else setTx({ ...tx, flow, cat: null, who: member.role, method: '카드', whoAuto: true });
   };
   const setCat = (cat) => {
     const next = { ...tx, cat };
-    if (cat === '매출') { next.who = 'wife'; next.method = '현금'; next.whoAuto = false; }
-    else if (cat === '급여') { next.who = 'husband'; next.method = '계좌'; next.whoAuto = false; }
+    if (cat === '급여') { next.who = 'husband'; next.method = '계좌'; next.whoAuto = false; }
     setTx(next);
   };
   const save = () => {
@@ -159,7 +155,6 @@ export default function InputSheet({ mode, preset, categories, member, onClose, 
         <button className={`s ${draft.flow === '수입' ? 'on in' : ''}`} onClick={() => setFlow('수입')}>수입</button>
       </div>
       <div className="amt-disp"><div className={`big num ${amt ? '' : 'zero'}`}>{amt ? fmt(amt) : '0'}<span className="cur"> 원</span></div></div>
-      <div className="fee-line">{isSalonCard && amt ? <>카드 수수료 10% −{fmt(fee)} → 실수령 <b>{fmt(amt - fee)}원</b></> : ''}</div>
       <Quick opts={[['+1만', 10000], ['+5만', 50000], ['+10만', 100000], ['+50만', 500000]]} onAdd={addAmt} />
 
       <div className="field-lab">카테고리</div>
@@ -171,11 +166,6 @@ export default function InputSheet({ mode, preset, categories, member, onClose, 
         <>
           <div className="field-lab">받는 사람</div>
           <span className="fixed-owner h">남편 급여 · 금액만 입력</span>
-        </>
-      ) : draft.cat === '매출' ? (
-        <>
-          <div className="field-lab">받는 사람</div>
-          <span className="fixed-owner w">아내 미용실 매출</span>
         </>
       ) : (
         <>

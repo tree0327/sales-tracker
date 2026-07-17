@@ -18,6 +18,22 @@ describe('ledger', () => {
     expect(f.balance).toBe(-1850000 + 3090000 - 50000);
   });
 
+  it('monthlyFlow: salon(매출 final 합)·salary(급여 final 합) 필드 추가', () => {
+    const transactions = [
+      tx({ flow: 'income', category: '급여', owner: 'husband', amount: 3000000, final: 3000000 }),
+      tx({ flow: 'income', category: '매출', owner: 'wife', method: '카드', amount: 100000, final: 90000 }), // 카드 10만원 → final 9만
+      tx({ flow: 'income', category: '매출', owner: 'wife', method: '현금', amount: 20000, final: 20000 }),
+      tx({ flow: 'income', category: '기타수입', owner: 'wife', amount: 5000, final: 5000 }),
+      tx({ flow: 'expense', category: '생활', owner: 'joint', amount: 50000 }),
+    ];
+    const f = monthlyFlow(transactions, []);
+    expect(f.salon).toBe(110000); // 90000 + 20000, final 합
+    expect(f.salary).toBe(3000000);
+    // 기존 필드는 그대로 유지
+    expect(f.income).toBe(3115000);
+    expect(f.expense).toBe(50000);
+  });
+
   it('byCategory: 카테고리 합계 내림차순', () => {
     const list = [
       tx({ flow: 'expense', category: '식비', amount: 10000 }),
