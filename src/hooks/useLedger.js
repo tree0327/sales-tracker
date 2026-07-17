@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase, TX_TABLE, FIXED_TABLE, CATEGORY_TABLE, BUDGET_TABLE } from '../supabaseClient';
-import { computeFinal } from '../utils/money';
+import { computeFinal, buildUpdatePatch } from '../utils/money';
 
 // 부부 가계부 데이터 계층.
 // transactions / fixed_expenses / expense_categories 를 로드하고 추가·삭제한다.
@@ -63,6 +63,18 @@ export function useLedger() {
     return data;
   }, []);
 
+  const updateTransaction = useCallback(async ({ id, flow, category, method, amount, memo, date }) => {
+    const patch = buildUpdatePatch({ flow, category, method, amount, memo, date });
+    const snap = transactions;
+    // 낙관적 갱신 후 실패하면 스냅샷으로 되돌린다(deleteTransaction 과 동일한 패턴).
+    setTransactions((prev) => prev.map((t) => (t.id === id ? { ...t, ...patch } : t)));
+    const { data, error: e } = await supabase.from(TX_TABLE).update(patch).eq('id', id).select().single();
+    if (e) { setError(e.message); setTransactions(snap); return null; }
+    setError(null);
+    setTransactions((prev) => prev.map((t) => (t.id === id ? data : t)));
+    return data;
+  }, [transactions]);
+
   const deleteTransaction = useCallback(async (id) => {
     const snap = transactions;
     setTransactions((prev) => prev.filter((t) => t.id !== id));
@@ -120,7 +132,7 @@ export function useLedger() {
 
   return {
     transactions, fixed, categories, budgets, loading, error, needsSetup,
-    reload, addTransaction, deleteTransaction, addFixed, deleteFixed, addCategory, deleteCategory, setBudget,
+    reload, addTransaction, updateTransaction, deleteTransaction, addFixed, deleteFixed, addCategory, deleteCategory, setBudget,
   };
 }
 

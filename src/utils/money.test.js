@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { fmt, fmtSigned, cardFinal, computeFinal } from './money';
+import { fmt, fmtSigned, cardFinal, computeFinal, buildUpdatePatch } from './money';
 
 describe('money', () => {
   it('fmt: 천단위 콤마 + 음수는 −', () => {
@@ -24,5 +24,34 @@ describe('money', () => {
     expect(computeFinal({ flow: 'income', category: '매출', method: '현금', amount: 100000 })).toBe(100000);
     expect(computeFinal({ flow: 'income', category: '급여', method: '계좌', amount: 3000000 })).toBe(3000000);
     expect(computeFinal({ flow: 'expense', category: '식비', method: '카드', amount: 12000 })).toBe(12000);
+  });
+});
+
+describe('buildUpdatePatch', () => {
+  it('매출 카드는 수수료 10%를 뗀 final을 만든다', () => {
+    const patch = buildUpdatePatch({
+      flow: 'income', category: '매출', method: '카드',
+      amount: 100000, memo: ' 염색 ', date: '2026-07-16T03:00:00Z',
+    });
+    expect(patch).toEqual({
+      amount: 100000, final: 90000, method: '카드',
+      memo: '염색', date: '2026-07-16T03:00:00Z',
+    });
+  });
+
+  it('매출 현금은 원금 그대로다', () => {
+    const patch = buildUpdatePatch({
+      flow: 'income', category: '매출', method: '현금', amount: 70000, memo: '', date: '2026-07-16T03:00:00Z',
+    });
+    expect(patch.final).toBe(70000);
+  });
+
+  it('금액이 비어 있으면 0으로 정규화한다', () => {
+    const patch = buildUpdatePatch({
+      flow: 'income', category: '매출', method: '현금', amount: '', memo: null, date: '2026-07-16T03:00:00Z',
+    });
+    expect(patch.amount).toBe(0);
+    expect(patch.final).toBe(0);
+    expect(patch.memo).toBe('');
   });
 });

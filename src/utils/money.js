@@ -27,3 +27,14 @@ export function computeFinal({ flow, category, method, amount }) {
   if (flow === 'income' && category === '매출' && method === '카드') return cardFinal(n);
   return n;
 }
+
+// 거래 수정 시 DB에 보낼 패치. addTransaction 의 payload 규칙과 동일하게 final 을 재계산한다.
+export function buildUpdatePatch({ flow, category, method, amount, memo, date }) {
+  return {
+    amount: Number(amount) || 0,
+    final: computeFinal({ flow, category, method, amount }),
+    method,
+    memo: (memo || '').trim(),
+    date,
+  };
+}
