@@ -8,3 +8,10 @@ export function buildRecordDateISO(selectedDate, timeSourceISO = null, now = new
   const dt = new Date(y, m - 1, d, src.getHours(), src.getMinutes(), src.getSeconds());
   return dt.toISOString();
 }
+
+// 로컬 기준 YYYY-MM-DD. date input 의 값·max 에 쓴다.
+// toISOString().slice(0,10) 은 UTC 날짜라 KST 00~09시에 하루 밀린다 — 그 대체.
+export function localYMD(dateLike) {
+  const d = dateLike instanceof Date ? dateLike : new Date(dateLike);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}

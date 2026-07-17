@@ -1,14 +1,16 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { CARD_FEE_RATE, cardFinal } from '../utils/money';
-import { buildRecordDateISO } from '../utils/recordDate';
+import { buildRecordDateISO, localYMD } from '../utils/recordDate';
 
 // 매출 입력/수정. 부모가 열 때마다 key 를 바꿔 리마운트하므로 초기값은 useState 초기화로 한 번만 계산한다.
 export default function SalesInputModal({ isOpen, type, initialData, onClose, onSave }) {
   const [amount, setAmount] = useState(initialData ? String(initialData.original || '') : '');
   const [name, setName] = useState(initialData?.name || '');
+  // 로컬 날짜로 다뤄야 한다 — ISO(UTC) 잘라 쓰면 KST 00~09시에 하루 밀린 날짜가
+  // 프리필/저장되는 조용한 데이터 손상이 난다(심야 마감 입력이 흔한 사용 패턴).
   const [date, setDate] = useState(
-    initialData?.date ? initialData.date.slice(0, 10) : new Date().toISOString().slice(0, 10)
+    initialData?.date ? localYMD(initialData.date) : localYMD(new Date())
   );
   const [err, setErr] = useState('');
 
@@ -36,7 +38,7 @@ export default function SalesInputModal({ isOpen, type, initialData, onClose, on
 
         <label className="field">
           <span className="field-label">날짜</span>
-          <input type="date" value={date} max={new Date().toISOString().slice(0, 10)}
+          <input type="date" value={date} max={localYMD(new Date())}
             onChange={(e) => setDate(e.target.value)} />
         </label>
 
