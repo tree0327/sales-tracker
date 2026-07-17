@@ -9,8 +9,8 @@
 // (권장) Supabase Auth 사용자 메타데이터에 { "role": "wife" } / { "role": "husband" } 를 넣으세요.
 
 const EMAIL_ROLE = {
-  // 'wife@example.com': 'wife',
-  // 'husband@example.com': 'husband',
+  'wife@home.local': 'wife',
+  'husband@home.local': 'husband',
 };
 
 export const MEMBERS = {
