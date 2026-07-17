@@ -7,7 +7,9 @@
   --bg: #ffffff;
   --fg: #171717;
   --fg-2: rgba(0, 0, 0, .6);
-  --fg-3: rgba(0, 0, 0, .4);
+  /* DESIGN.md §3은 캡션을 black/40~50 으로 규정하지만 흰 배경에서 2.85~3.95:1 로 AA 미달이다.
+     §8의 "black/40 밑으로 내려가지 말 것"(하한)은 지키면서 4.74:1 로 올린 값. */
+  --fg-3: rgba(0, 0, 0, .55);
   --line: rgba(0, 0, 0, .1);
   --fill: rgba(0, 0, 0, .05);
 
@@ -165,7 +167,7 @@ button, input { font-family: inherit; }
 .login .lead { text-align: center; color: var(--fg-2); font-size: 13px; margin: 0 0 28px; }
 .lfield { margin-bottom: 12px; }
 .lfield label { font-size: 12px; font-weight: 700; color: var(--fg-2); display: block; margin: 0 4px 8px; }
-.lfield input { width: 100%; border: 1px solid var(--line); background: var(--bg); border-radius: var(--r-md); padding: 14px; font-size: 15px; color: var(--fg); }
+.lfield input { width: 100%; border: 1px solid var(--line); background: var(--bg); border-radius: var(--r-md); padding: 16px; font-size: 15px; color: var(--fg); }
 .login .primary { margin-top: 8px; width: 100%; padding: 16px; border-radius: var(--r-lg); background: var(--accent); color: var(--on-accent); font-size: 15px; font-weight: 700; border: none; cursor: pointer; min-height: 56px; }
 .login .primary:disabled { opacity: .6; }
 .login .lmsg { text-align: center; font-size: 12px; margin-top: 12px; font-weight: 500; }
