@@ -1,5 +1,22 @@
 import { describe, it, expect } from 'vitest';
-import { buildRecordDateISO } from './recordDate.js';
+import { buildRecordDateISO, localYMD } from './recordDate.js';
+
+describe('localYMD', () => {
+  it('Date 를 로컬 기준 YYYY-MM-DD 로 만든다 (UTC 아님)', () => {
+    // KST(UTC+9)에서 2026-07-18 00:30 은 UTC 로는 7/17 — toISOString 이었다면 하루 밀린다.
+    const d = new Date(2026, 6, 18, 0, 30, 0);
+    expect(localYMD(d)).toBe('2026-07-18');
+  });
+
+  it('ISO 문자열도 로컬 날짜로 변환한다', () => {
+    const d = new Date(2026, 0, 5, 8, 0, 0); // 로컬 1/5 08:00 — UTC 로는 1/4 밤일 수 있는 시각
+    expect(localYMD(d.toISOString())).toBe('2026-01-05');
+  });
+
+  it('한 자리 월·일은 0 패딩한다', () => {
+    expect(localYMD(new Date(2026, 2, 7, 12, 0, 0))).toBe('2026-03-07');
+  });
+});
 
 describe('buildRecordDateISO', () => {
   it('신규 입력: 선택 날짜 + 실제 현재 시각을 반영(정오 고정 아님)', () => {

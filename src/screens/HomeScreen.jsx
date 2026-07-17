@@ -14,22 +14,22 @@ function BudgetGauge({ used, budget }) {
   const pct = Math.round(ratio * 100);
   const over = used > budget;
   const near = !over && ratio >= 0.8;
-  const color = over ? 'var(--expense)' : near ? 'var(--brand)' : 'var(--income)';
+  const color = over ? 'var(--err-fg)' : near ? 'var(--warn-fg)' : 'var(--fg)';
   return (
-    <div className="central" style={{ marginTop: 11, padding: '16px 18px' }}>
+    <div className="central" style={{ marginTop: 12, padding: '16px 16px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
         <span className="cap">이번 달 예산</span>
-        <span className="num" style={{ fontWeight: 800, color }}>{pct}%</span>
+        <span className="num" style={{ fontWeight: 700, color }}>{pct}%</span>
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, fontSize: 13, fontWeight: 700 }}>
         <span className="num">{fmt(used)}원 사용</span>
-        <span className="num" style={{ color: 'var(--ink-3)' }}>/ {fmt(budget)}원</span>
+        <span className="num" style={{ color: 'var(--fg-3)' }}>/ {fmt(budget)}원</span>
       </div>
-      <div style={{ height: 9, marginTop: 10, background: 'var(--surface-2)', borderRadius: 999, overflow: 'hidden' }}>
+      <div style={{ height: 9, marginTop: 8, background: 'var(--fill)', borderRadius: 999, overflow: 'hidden' }}>
         <i style={{ display: 'block', height: '100%', width: `${Math.min(100, pct)}%`, background: color, borderRadius: 999 }} />
       </div>
-      {over && <div style={{ marginTop: 8, fontSize: 12, fontWeight: 700, color: 'var(--expense)' }}>예산을 {fmt(used - budget)}원 초과했어요</div>}
-      {near && <div style={{ marginTop: 8, fontSize: 12, fontWeight: 700, color: 'var(--brand-ink)' }}>예산의 {pct}%를 썼어요</div>}
+      {over && <div style={{ marginTop: 8, fontSize: 12, fontWeight: 700, color: 'var(--err-fg)' }}>예산을 {fmt(used - budget)}원 초과했어요</div>}
+      {near && <div style={{ marginTop: 8, fontSize: 12, fontWeight: 700, color: 'var(--warn-fg)' }}>예산의 {pct}%를 썼어요</div>}
     </div>
   );
 }
@@ -75,9 +75,10 @@ export default function HomeScreen({ member, flow, monthLabel, overallBudget, on
 
         {overallBudget > 0 && <BudgetGauge used={flow.expense} budget={overallBudget} />}
 
-        <MenuCard icon="⟳" iconCls="fx-ic" name="고정지출" amount={`−${fmt(flow.fixed)}원`} color="var(--expense)" onClick={() => onNav('expense', '고정')} />
-        <MenuCard icon="−" iconCls="ex-ic" name="지출관리" amount={`−${fmt(flow.expense)}원`} color="var(--expense)" onClick={() => onNav('expense', 'joint')} />
-        <MenuCard icon="＋" iconCls="in-ic" name="매출/급여관리" amount={`+${fmt(flow.income)}원`} color="var(--income)" onClick={() => onNav('income')} />
+        <MenuCard icon="⟳" iconCls="fx-ic" name="고정지출" amount={`−${fmt(flow.fixed)}원`} color="var(--err-fg)" onClick={() => onNav('expense', '고정')} />
+        <MenuCard icon="−" iconCls="ex-ic" name="지출관리" amount={`−${fmt(flow.expense)}원`} color="var(--err-fg)" onClick={() => onNav('expense', 'joint')} />
+        <MenuCard icon="＋" iconCls="in-ic" name="매출관리" amount={`+${fmt(flow.salon)}원`} color="var(--ok-fg)" onClick={() => onNav('sales')} />
+        <MenuCard icon="＋" iconCls="in-ic" name="급여관리" amount={`+${fmt(flow.salary)}원`} color="var(--ok-fg)" onClick={() => onNav('income')} />
       </div>
     </div>
   );

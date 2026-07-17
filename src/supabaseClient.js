@@ -12,9 +12,6 @@ if (!supabaseUrl || !supabaseKey) {
 
 export const supabase = createClient(supabaseUrl ?? '', supabaseKey ?? '');
 
-// 레거시(미용실 매출) 테이블 — 마이그레이션 후에는 참조하지 않는다.
-export const RECORDS_TABLE = 'sales_records';
-
 // 부부 가계부 테이블
 export const TX_TABLE = 'transactions';
 export const FIXED_TABLE = 'fixed_expenses';

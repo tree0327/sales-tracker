@@ -5,12 +5,12 @@ const INC_CATS = ['매출', '급여', '기타수입'];
 
 function BudgetInput({ label, value, onSave }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid var(--line-2)' }}>
-      <span style={{ flex: 1, fontSize: 13.5, fontWeight: 600 }}>{label}</span>
-      <input className="memo-input" style={{ width: 130, textAlign: 'right', padding: '9px 12px' }}
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0', borderBottom: '1px solid var(--line)' }}>
+      <span style={{ flex: 1, fontSize: 14, fontWeight: 500 }}>{label}</span>
+      <input className="memo-input" style={{ width: 130, textAlign: 'right', padding: '8px 12px' }}
         type="number" inputMode="numeric" defaultValue={value || ''} placeholder="0"
         onBlur={(e) => onSave(e.target.value)} />
-      <span style={{ fontSize: 12, color: 'var(--ink-3)' }}>원</span>
+      <span style={{ fontSize: 12, color: 'var(--fg-3)' }}>원</span>
     </div>
   );
 }
@@ -64,7 +64,7 @@ export default function SettingsScreen({ categories, budgets, member, onNav, onS
 
         <div className="set-card">
           <h3>계정</h3>
-          <p className="desc">현재 <b style={{ color: 'var(--ink)' }}>{member.name}</b>로 로그인됨</p>
+          <p className="desc">현재 <b className="calm">{member.name}</b>로 로그인됨</p>
           <button className="set-logout" onClick={onLogout}>로그아웃</button>
         </div>
       </div>

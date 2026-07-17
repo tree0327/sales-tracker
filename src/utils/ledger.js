@@ -25,7 +25,9 @@ export function monthlyFlow(transactions, fixed) {
   const income = sumFinal(incomeList(transactions));
   const expense = sumAmount(expenseList(transactions));
   const fixedT = fixedTotal(fixed);
-  return { fixed: fixedT, income, expense, balance: -fixedT + income - expense };
+  const salon = sumFinal(incomeList(transactions).filter((t) => t.category === '매출'));
+  const salary = sumFinal(incomeList(transactions).filter((t) => t.category === '급여'));
+  return { fixed: fixedT, income, expense, balance: -fixedT + income - expense, salon, salary };
 }
 
 // 특정 소유자의 변동지출 목록

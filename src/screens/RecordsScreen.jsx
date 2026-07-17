@@ -66,9 +66,9 @@ export default function RecordsScreen({ transactions, budgets, onDelete }) {
 
         <div className="filterbar" style={{ marginTop: 8 }}>
           <div className="fchips">
-            {PERSONS.map(([label, val, cls]) => (
+            {PERSONS.map(([label, val]) => (
               <button key={val} className={`fchip ${person === val ? 'on' : ''}`} onClick={() => { setPerson(val); setDay(null); }}>
-                {cls && <span className={`dt ${cls}`} style={{ marginRight: 5 }}></span>}{label}
+                {label}
               </button>
             ))}
           </div>
@@ -89,10 +89,10 @@ export default function RecordsScreen({ transactions, budgets, onDelete }) {
 
         <div className="mini-hero">
           <div>
-            <div className="k">{month}월 기록 <span style={{ color: 'var(--ink-3)' }}>· {filtered.length}건</span></div>
-            <div style={{ display: 'flex', gap: 14, marginTop: 6, fontSize: 13.5, fontWeight: 700 }}>
-              <span style={{ color: 'var(--income)' }}>수입 {fmt(incT)}</span>
-              <span style={{ color: 'var(--ink)' }}>지출 {fmt(expT)}</span>
+            <div className="k">{month}월 기록 <span style={{ color: 'var(--fg-3)' }}>· {filtered.length}건</span></div>
+            <div style={{ display: 'flex', gap: 16, marginTop: 6, fontSize: 14, fontWeight: 700 }}>
+              <span className="pos">수입 {fmt(incT)}</span>
+              <span className="calm">지출 {fmt(expT)}</span>
             </div>
           </div>
         </div>
@@ -126,7 +126,7 @@ function DayGroup({ group, onDelete }) {
     <>
       <div className="sec-title" style={{ marginTop: 16 }}>
         {dayLabel(group.day)}
-        <span className="r num" style={{ color: net >= 0 ? 'var(--income)' : 'var(--ink-3)' }}>{net >= 0 ? '+' : '−'}{fmt(Math.abs(net))}</span>
+        <span className="r num" style={{ color: net >= 0 ? 'var(--ok-fg)' : 'var(--fg-3)' }}>{net >= 0 ? '+' : '−'}{fmt(Math.abs(net))}</span>
       </div>
       {group.items.map((t) => <TxRow key={t.id} tx={t} onDelete={onDelete} />)}
     </>

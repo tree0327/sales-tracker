@@ -5,6 +5,7 @@ import { useLedger } from './hooks/useLedger';
 import { monthlyFlow, isSameMonth, budgetMap, OVERALL, byCategory, sumFinal, sumAmount, incomeList, expenseList, jointBalance, jointContributions, jointDeposits } from './utils/ledger';
 import HomeScreen from './screens/HomeScreen';
 import ExpenseScreen from './screens/ExpenseScreen';
+import SalesScreen from './screens/SalesScreen';
 import IncomeScreen from './screens/IncomeScreen';
 import RecordsScreen from './screens/RecordsScreen';
 import SettingsScreen from './screens/SettingsScreen';
@@ -31,7 +32,6 @@ export default function Ledger({ user }) {
     try { return !!window.localStorage.getItem(reportKey); } catch { return true; }
   });
   const [expenseTab, setExpenseTab] = useState('고정');
-  const [incomeKind, setIncomeKind] = useState('매출');
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetMode, setSheetMode] = useState('tx');   // 'tx' | 'fixed'
@@ -60,7 +60,7 @@ export default function Ledger({ user }) {
     const row = await ledger.addTransaction(payload);
     closeSheet();
     if (row) {
-      notify(`${payload.flow === 'expense' ? '지출' : payload.category === '급여' ? '급여' : payload.category === '매출' ? '매출' : '수입'} 저장!`);
+      notify(`${payload.flow === 'expense' ? '지출' : payload.category === '급여' ? '급여' : '수입'} 저장!`);
       setTab('home');
     }
   };
@@ -76,6 +76,15 @@ export default function Ledger({ user }) {
     });
     closeSheet();
     if (row) { notify('공금 충전 완료!'); setExpenseTab('joint'); setTab('expense'); }
+  };
+  // 매출 탭 전용. 매출은 항상 아내 소유 · income/매출 로 저장된다.
+  const addSales = async ({ method, amount, memo, date }) => {
+    const row = await ledger.addTransaction({ flow: 'income', category: '매출', owner: 'wife', method, amount, memo, date });
+    if (row) notify('매출 저장!');
+  };
+  const updateSales = async ({ id, method, amount, memo, date }) => {
+    const row = await ledger.updateTransaction({ id, flow: 'income', category: '매출', method, amount, memo, date });
+    if (row) notify('매출 수정!');
   };
   const logout = () => supabase.auth.signOut();
 
@@ -131,7 +140,10 @@ export default function Ledger({ user }) {
           onNav={onNav} onAddFixed={openFixed} onDeleteFixed={ledger.deleteFixed}
           jointStat={jointStat} deposits={deposits} onDeposit={openTransfer} />
       )}
-      {tab === 'income' && <IncomeScreen transactions={monthTx} kind={incomeKind} onKind={setIncomeKind} onAddIncome={openInput} />}
+      {tab === 'sales' && (
+        <SalesScreen transactions={transactions} onAdd={addSales} onUpdate={updateSales} onDelete={ledger.deleteTransaction} />
+      )}
+      {tab === 'income' && <IncomeScreen transactions={monthTx} onAddIncome={openInput} />}
       {tab === 'records' && <RecordsScreen transactions={transactions} budgets={bmap} onDelete={ledger.deleteTransaction} />}
       {tab === 'settings' && (
         <SettingsScreen categories={categories} budgets={bmap} member={member} onNav={onNav}
