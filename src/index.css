@@ -1,7 +1,7 @@
 :root {
-  --paper: #E4D9C3; --surface: #FBF6EA; --surface-2: #F3EAD8; --ink: #2C2418; --ink-2: #77694F; --ink-3: #A99A7C; --line: #E0D3B9; --line-2: #E9DEC8;
-  --brand: #C8842A; --brand-soft: #F4E4C4; --brand-ink: #8A5613; --income: #2C8C63; --income-soft: #DDEFE2; --expense: #C6503F; --expense-soft: #F6E1D9;
-  --husband: #3D74B0; --husband-soft: #DFEAF3; --wife: #C9587E; --wife-soft: #F5E0E6; --joint: #C8842A; --joint-soft: #F4E4C4;
+  --paper: #F1E6D3; --surface: #FDF9F1; --surface-2: #F7EEDF; --ink: #3A2E1E; --ink-2: #8A7859; --ink-3: #B7A888; --line: #ECE0CA; --line-2: #F3EBDA;
+  --brand: #CD8B39; --brand-soft: #F7E8CD; --brand-ink: #8E5B1B; --income: #4A9E75; --income-soft: #E4F1E6; --expense: #D26F5A; --expense-soft: #F9E8DF;
+  --husband: #5E88B8; --husband-soft: #E9EFF6; --wife: #D3728F; --wife-soft: #F9E7EC; --joint: #CD8B39; --joint-soft: #F7E8CD;
   --shadow: 0 1px 2px rgba(60,45,20,.06), 0 10px 30px rgba(60,45,20,.10); --shadow-sm: 0 1px 3px rgba(60,45,20,.09);
   --font: "Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", Roboto, sans-serif;
   --maxw: 480px;
