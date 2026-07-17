@@ -35,10 +35,10 @@ export default function SalesScreen({ transactions, onAdd, onUpdate, onDelete })
 
   return (
     <div>
-      <header className="app-head"><span className="title">매출관리</span></header>
+      <header className="app-head sales-head"><span className="title">매출관리</span></header>
       <div className="body">
         <div className="sales-buttons">
-          <button className="sq-btn" onClick={() => openNew('현금')}>
+          <button className="sq-btn fill" onClick={() => openNew('현금')}>
             <span className="sq-icon" aria-hidden="true">￦</span>
             <span>현금</span>
           </button>

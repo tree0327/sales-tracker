@@ -57,7 +57,7 @@ button, input { font-family: inherit; }
 
 .body { padding: 4px 16px 16px; }
 
-.central { background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 24px 16px 16px; }
+.central { background: var(--bg); border: 2px solid var(--fg); border-radius: var(--r-lg); padding: 24px 16px 16px; }
 .central .cap { font-size: 13px; color: var(--fg-2); font-weight: 700; }
 .central .bal { font-size: 40px; font-weight: 700; letter-spacing: -.025em; margin: 4px 0 4px; }
 .central .bal .won { font-size: 20px; color: var(--fg-2); margin-left: 4px; font-weight: 700; }
@@ -75,7 +75,7 @@ button, input { font-family: inherit; }
 .fr.total .k { color: var(--fg); font-weight: 700; font-size: 14px; }
 .fr.total .v { font-size: 22px; font-weight: 700; }
 
-.menu-card { display: flex; align-items: center; justify-content: space-between; width: 100%; text-align: left; background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px; margin-top: 12px; cursor: pointer; min-height: 48px; }
+.menu-card { display: flex; align-items: center; justify-content: space-between; width: 100%; text-align: left; background: var(--bg); border: 2px solid var(--fg); border-radius: var(--r-lg); padding: 16px; margin-top: 12px; cursor: pointer; min-height: 48px; }
 .menu-card .name { font-size: 15px; font-weight: 700; color: var(--fg); display: flex; align-items: center; gap: 8px; }
 .menu-card .name .ic { width: 28px; height: 28px; border-radius: var(--r-md); display: grid; place-items: center; font-size: 15px; }
 .ic.ex-ic { background: var(--err-bg); color: var(--err-fg); }
@@ -87,14 +87,14 @@ button, input { font-family: inherit; }
 .sec-title { font-size: 13px; font-weight: 700; color: var(--fg-2); margin: 20px 4px 8px; display: flex; justify-content: space-between; align-items: baseline; }
 .sec-title .r { color: var(--fg-3); font-weight: 700; font-size: 12px; }
 
-.mini-hero { background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px; margin-top: 12px; display: flex; align-items: flex-end; justify-content: space-between; }
+.mini-hero { background: var(--bg); border: 2px solid var(--fg); border-radius: var(--r-lg); padding: 16px; margin-top: 12px; display: flex; align-items: flex-end; justify-content: space-between; }
 .mini-hero .k { font-size: 12px; color: var(--fg-2); font-weight: 700; display: flex; align-items: center; gap: 8px; }
 .mini-hero .v { font-size: 26px; font-weight: 700; margin-top: 4px; letter-spacing: -.02em; }
 .mini-hero .r { text-align: right; font-size: 12px; color: var(--fg-3); font-weight: 500; }
 .mini-hero .r b { color: var(--fg-2); }
 .unit { margin-left: 2px; font-size: 14px; color: var(--fg-2); }
 
-.seg { display: flex; background: var(--fill); border: 1px solid var(--line); border-radius: var(--r-md); padding: 4px; gap: 4px; }
+.seg { display: flex; background: var(--fill); border: 2px solid var(--fg); border-radius: var(--r-md); padding: 4px; gap: 4px; }
 .seg .s { flex: 1; text-align: center; padding: 12px 4px; border-radius: var(--r-md); font-size: 12px; font-weight: 700; color: var(--fg-2); cursor: pointer; border: none; background: none; min-height: 48px; }
 .seg .s.on { background: var(--bg); color: var(--fg); }
 .seg .s.on.fx { background: var(--err-fg); color: var(--on-accent); }
@@ -135,16 +135,16 @@ button, input { font-family: inherit; }
 .tx .del { background: none; border: none; color: var(--fg-3); font-size: 17px; padding: 4px 4px 4px 8px; cursor: pointer; }
 .empty { text-align: center; color: var(--fg-3); font-size: 13px; padding: 32px 12px; line-height: 1.7; }
 
-.add-row { margin-top: 12px; width: 100%; padding: 16px; border-radius: var(--r-md); border: 1.5px dashed var(--line); color: var(--fg-2); font-size: 13px; font-weight: 700; text-align: center; background: transparent; cursor: pointer; min-height: 48px; }
+.add-row { margin-top: 12px; width: 100%; padding: 16px; border-radius: var(--r-md); border: 2px dashed var(--fg-2); color: var(--fg-2); font-size: 13px; font-weight: 700; text-align: center; background: transparent; cursor: pointer; min-height: 48px; }
 
-.set-card { background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px; margin-top: 12px; }
+.set-card { background: var(--bg); border: 2px solid var(--fg); border-radius: var(--r-lg); padding: 16px; margin-top: 12px; }
 .set-card h3 { font-size: 13px; font-weight: 700; margin: 0 0 4px; }
 .set-card .desc { font-size: 12px; color: var(--fg-3); margin: 0 0 12px; }
 .catlist { display: flex; flex-wrap: wrap; gap: 8px; }
 .catlist .cchip { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; padding: 8px 8px 8px 12px; border-radius: 999px; background: var(--fill); border: 1px solid var(--line); color: var(--fg); }
 .catlist .cchip .x { width: 18px; height: 18px; border-radius: 50%; background: var(--err-bg); color: var(--err-fg); display: grid; place-items: center; font-size: 12px; cursor: pointer; font-weight: 700; border: none; }
 .addcat { display: flex; gap: 8px; margin-top: 12px; }
-.addcat input { flex: 1; border: 1px solid var(--line); background: var(--fill); border-radius: var(--r-md); padding: 12px; font-size: 14px; color: var(--fg); }
+.addcat input { flex: 1; border: 2px solid var(--fg); background: var(--fill); border-radius: var(--r-md); padding: 12px; font-size: 14px; color: var(--fg); }
 .addcat button { border: none; background: var(--accent); color: var(--on-accent); font-weight: 700; font-size: 13px; padding: 0 20px; border-radius: var(--r-md); cursor: pointer; }
 .set-logout { width: 100%; margin-top: 4px; padding: 16px; border-radius: var(--r-md); border: 1px solid var(--line); background: var(--fill); color: var(--err-fg); font-weight: 700; font-size: 14px; cursor: pointer; }
 
@@ -156,7 +156,7 @@ button, input { font-family: inherit; }
 .setup p { color: var(--fg-2); font-size: 14px; line-height: 1.7; }
 .setup code { background: var(--fill); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 4px 8px; font-size: 12px; }
 
-.tabbar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: var(--maxw); height: 64px; background: color-mix(in srgb, var(--bg) 94%, transparent); backdrop-filter: blur(10px); border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-around; padding: 0 8px 4px; z-index: 20; }
+.tabbar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: var(--maxw); height: 64px; background: color-mix(in srgb, var(--bg) 94%, transparent); backdrop-filter: blur(10px); border-top: 2px solid var(--fg); display: flex; align-items: center; justify-content: space-around; padding: 0 8px 4px; z-index: 20; }
 .tabbar .tb { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; color: var(--fg-3); flex: 1; cursor: pointer; background: none; border: none; min-height: 48px; }
 .tabbar .tb.active { color: var(--fg); }
 .tabbar .tb i { font-style: normal; font-size: 17px; line-height: 1; }
@@ -168,14 +168,14 @@ button, input { font-family: inherit; }
 .login .lead { text-align: center; color: var(--fg-2); font-size: 13px; margin: 0 0 28px; }
 .lfield { margin-bottom: 12px; }
 .lfield label { font-size: 12px; font-weight: 700; color: var(--fg-2); display: block; margin: 0 4px 8px; }
-.lfield input { width: 100%; border: 1px solid var(--line); background: var(--bg); border-radius: var(--r-md); padding: 16px; font-size: 15px; color: var(--fg); }
+.lfield input { width: 100%; border: 2px solid var(--fg); background: var(--bg); border-radius: var(--r-md); padding: 16px; font-size: 15px; color: var(--fg); }
 .login .primary { margin-top: 8px; width: 100%; padding: 16px; border-radius: var(--r-lg); background: var(--accent); color: var(--on-accent); font-size: 15px; font-weight: 700; border: none; cursor: pointer; min-height: 56px; }
 .login .primary:disabled { opacity: .6; }
 .login .lmsg { text-align: center; font-size: 12px; margin-top: 12px; font-weight: 500; }
 .login .lmsg.error { color: var(--err-fg); }
 
 .scrim { position: fixed; inset: 0; background: rgba(0, 0, 0, .42); opacity: 0; pointer-events: none; transition: opacity .22s; z-index: 40; }
-.sheet { position: fixed; left: 50%; bottom: 0; transform: translateX(-50%) translateY(102%); width: 100%; max-width: var(--maxw); z-index: 41; background: var(--bg); border-radius: var(--r-lg) var(--r-lg) 0 0; border: 1px solid var(--line); border-bottom: none; box-shadow: var(--shadow-sm); transition: transform .26s cubic-bezier(.32,.72,.32,1); max-height: 92vh; overflow-y: auto; padding: 8px 20px 24px; }
+.sheet { position: fixed; left: 50%; bottom: 0; transform: translateX(-50%) translateY(102%); width: 100%; max-width: var(--maxw); z-index: 41; background: var(--bg); border-radius: var(--r-lg) var(--r-lg) 0 0; border: 2px solid var(--fg); border-bottom: none; box-shadow: var(--shadow-sm); transition: transform .26s cubic-bezier(.32,.72,.32,1); max-height: 92vh; overflow-y: auto; padding: 8px 20px 24px; }
 .sheet::-webkit-scrollbar { width: 0; }
 .sheet-open .scrim { opacity: 1; pointer-events: auto; }
 .sheet-open .sheet { transform: translateX(-50%) translateY(0); }
@@ -197,7 +197,7 @@ button, input { font-family: inherit; }
 .who { display: flex; gap: 8px; }
 .who .w2 { flex: 1; text-align: center; padding: 12px; border-radius: var(--r-md); font-size: 13px; font-weight: 700; border: 1.5px solid var(--line); background: var(--fill); color: var(--fg-2); cursor: pointer; }
 .who .w2.on { border-color: var(--fg); background: var(--fill); color: var(--fg); }
-.memo-input { width: 100%; border: 1px solid var(--line); background: var(--fill); border-radius: var(--r-md); padding: 12px 16px; font-size: 14px; color: var(--fg); }
+.memo-input { width: 100%; border: 2px solid var(--fg); background: var(--fill); border-radius: var(--r-md); padding: 12px 16px; font-size: 14px; color: var(--fg); }
 .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 16px; }
 .key { text-align: center; padding: 16px; font-size: 20px; font-weight: 700; border-radius: var(--r-md); background: var(--fill); border: 1px solid var(--line); cursor: pointer; user-select: none; color: var(--fg); }
 .key:active { background: var(--fill); }
@@ -208,7 +208,7 @@ button, input { font-family: inherit; }
 
 /* month-end report modal */
 .modal-scrim { position: fixed; inset: 0; background: rgba(0, 0, 0, .5); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 24px; }
-.modal { background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 24px 24px 20px; width: 100%; max-width: 360px; box-shadow: var(--shadow-sm); text-align: center; }
+.modal { background: var(--bg); border: 2px solid var(--fg); border-radius: var(--r-lg); padding: 24px 24px 20px; width: 100%; max-width: 360px; box-shadow: var(--shadow-sm); text-align: center; }
 .modal .m-emoji { font-size: 32px; }
 .modal h3 { font-size: 18px; font-weight: 700; margin: 8px 0 16px; letter-spacing: -.01em; }
 .report-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 14px; font-weight: 500; color: var(--fg-2); }
@@ -222,18 +222,18 @@ button, input { font-family: inherit; }
 
 /* 매출 입력/수정 모달 (SalesInputModal) 등 폼형 모달 공용 패턴.
    .modal-scrim 은 위 월말 리포트 모달과 공유(중복 정의 안 함). */
-.modal-card { width: 100%; max-width: 384px; background: var(--bg); border-radius: var(--r-lg); padding: 24px; box-shadow: var(--shadow-sm); max-height: 90dvh; overflow-y: auto; }
+.modal-card { width: 100%; max-width: 384px; background: var(--bg); border: 2px solid var(--fg); border-radius: var(--r-lg); padding: 24px; box-shadow: var(--shadow-sm); max-height: 90dvh; overflow-y: auto; }
 .modal-title { margin: 0 0 16px; font-size: 16px; font-weight: 700; }
 .field { display: block; margin-bottom: 16px; }
 .field-label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; }
-.field input { width: 100%; min-height: 48px; padding: 12px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--bg); color: var(--fg); font-size: 16px; }
+.field input { width: 100%; min-height: 48px; padding: 12px; border: 2px solid var(--fg); border-radius: var(--r-md); background: var(--bg); color: var(--fg); font-size: 16px; }
 .field-hint { margin: -8px 0 16px; font-size: 12px; color: var(--fg-2); }
 .msg { margin: 0 0 16px; padding: 16px; border-radius: var(--r-md); font-size: 14px; }
 .msg.err { background: var(--err-bg); color: var(--err-fg); }
 .msg.ok { background: var(--ok-bg); color: var(--ok-fg); }
 .modal-actions { display: flex; gap: 12px; margin-top: 24px; }
 .btn-ghost, .btn-primary { flex: 1; min-height: 48px; border-radius: var(--r-md); font-size: 16px; font-weight: 500; cursor: pointer; transition: background-color .15s; }
-.btn-ghost { border: 1px solid var(--line); background: var(--bg); color: var(--fg); }
+.btn-ghost { border: 2px solid var(--fg); background: var(--bg); color: var(--fg); }
 .btn-ghost:hover { background: var(--fill); }
 .btn-primary { border: none; background: var(--accent); color: var(--on-accent); }
 .btn-primary:hover { background: rgba(23,23,23,.8); }
@@ -253,21 +253,21 @@ button, input { font-family: inherit; }
 .rec-amt { display: block; font-size: 14px; font-weight: 700; }
 .rec-org { display: block; font-size: 12px; color: var(--fg-3); }
 .rec-actions { display: flex; gap: 8px; width: 100%; justify-content: flex-end; }
-.btn-mini { min-height: 48px; padding: 0 12px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--bg); color: var(--fg-2); font-size: 12px; cursor: pointer; }
+.btn-mini { min-height: 48px; padding: 0 12px; border: 2px solid var(--fg); border-radius: var(--r-md); background: var(--bg); color: var(--fg-2); font-size: 12px; cursor: pointer; }
 .btn-mini.danger { color: var(--err-fg); }
 
 /* 매출관리 탭 (SalesScreen) */
 .sales-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.sq-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 96px; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--bg); color: var(--fg); font-size: 16px; font-weight: 500; cursor: pointer; transition: background-color .15s; }
+.sq-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 96px; border: 2px solid var(--fg); border-radius: var(--r-lg); background: var(--bg); color: var(--fg); font-size: 16px; font-weight: 500; cursor: pointer; transition: background-color .15s; }
 .sq-btn:hover { background: var(--fill); }
 .sq-icon { font-size: 28px; line-height: 1; }
 .sales-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
-.sum-card { border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px; }
+.sum-card { border: 2px solid var(--fg); border-radius: var(--r-lg); padding: 16px; }
 .sum-label { display: block; font-size: 12px; color: var(--fg-2); }
 .sum-label em { color: var(--fg-3); font-style: normal; }
 .sum-value { display: block; margin-top: 4px; font-size: 20px; font-weight: 700; }
 .sum-value em { margin-left: 2px; font-size: 12px; font-style: normal; color: var(--fg-2); }
-.sales-total { display: block; width: 100%; text-align: left; margin-top: 16px; border: 1px solid var(--line); border-radius: var(--r-lg); padding: 24px; background: var(--bg); cursor: pointer; transition: background-color .15s; }
+.sales-total { display: block; width: 100%; text-align: left; margin-top: 16px; border: 2px solid var(--fg); border-radius: var(--r-lg); padding: 24px; background: var(--bg); cursor: pointer; transition: background-color .15s; }
 .sales-total:hover { background: var(--fill); }
 .st-period { display: block; font-size: 12px; color: var(--fg-3); }
 .st-label { display: block; margin-top: 4px; font-size: 14px; color: var(--fg-2); }
@@ -275,3 +275,10 @@ button, input { font-family: inherit; }
 .st-amount em { margin-left: 4px; font-size: 16px; font-style: normal; color: var(--fg-2); }
 .st-subs { display: block; margin-top: 8px; font-size: 12px; color: var(--fg-2); }
 .st-hint { display: block; margin-top: 8px; font-size: 12px; color: var(--fg-3); }
+
+/* 매출관리 탭 정체성 — 가계부 화면들과 구분되는 검정 인버트 헤더.
+   현금(주 결제수단)은 검정 채움, 카드는 아웃라인으로 무게 차등. */
+.sales-head { background: var(--fg); }
+.sales-head .title { color: var(--on-accent); cursor: default; }
+.sq-btn.fill { background: var(--fg); color: var(--on-accent); }
+.sq-btn.fill:hover { background: rgba(23, 23, 23, .85); }
