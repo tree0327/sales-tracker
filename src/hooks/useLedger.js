@@ -54,9 +54,9 @@ export function useLedger() {
       .on('postgres_changes', { event: '*', schema: 'public', table: TX_TABLE },
         (e) => setTransactions((prev) => applyRealtimeEvent(prev, e, { sortByDateDesc: true })))
       .on('postgres_changes', { event: '*', schema: 'public', table: FIXED_TABLE },
-        (e) => setFixed((prev) => applyRealtimeEvent(prev, e)))
+        (e) => setFixed((prev) => applyRealtimeEvent(prev, e).sort((a, b) => b.amount - a.amount))) // applyRealtimeEvent는 항상 새 배열을 반환하므로 바로 정렬해도 원본 오염이 없다.
       .on('postgres_changes', { event: '*', schema: 'public', table: CATEGORY_TABLE },
-        (e) => setCategories((prev) => applyRealtimeEvent(prev, e)))
+        (e) => setCategories((prev) => applyRealtimeEvent(prev, e).sort((a, b) => (a.sort || 0) - (b.sort || 0))))
       .on('postgres_changes', { event: '*', schema: 'public', table: BUDGET_TABLE },
         (e) => setBudgets((prev) => applyRealtimeEvent(prev, e)))
       .subscribe();
