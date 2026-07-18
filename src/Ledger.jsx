@@ -13,6 +13,7 @@ import TabBar from './components/TabBar';
 import InputSheet from './components/InputSheet';
 import MonthlyReport from './components/MonthlyReport';
 import ConfirmDialog from './components/ConfirmDialog';
+import SalesInputModal from './components/SalesInputModal';
 
 const MONTH_LABEL = (() => { const d = new Date(); return `${d.getFullYear()}년 ${d.getMonth() + 1}월`; })();
 
@@ -41,6 +42,8 @@ export default function Ledger({ user }) {
   const [sheetMode, setSheetMode] = useState('tx');   // 'tx' | 'fixed'
   const [sheetPreset, setSheetPreset] = useState(null);
   const [openKey, setOpenKey] = useState(0);
+  const [editTx, setEditTx] = useState(null);         // 기록 탭 행 탭 → 수정 모드 대상 거래
+  const [salesEdit, setSalesEdit] = useState(null);    // 기록 탭에서 매출 행 수정 시(전용 모달)
 
   const [toast, setToast] = useState('');
   const toastTimer = useRef(null);
@@ -56,10 +59,18 @@ export default function Ledger({ user }) {
     setTab(view);
     window.scrollTo(0, 0);
   };
-  const openInput = (preset = null) => { setSheetMode('tx'); setSheetPreset(preset); setOpenKey((k) => k + 1); setSheetOpen(true); };
-  const openFixed = () => { setSheetMode('fixed'); setSheetPreset(null); setOpenKey((k) => k + 1); setSheetOpen(true); };
-  const openTransfer = () => { setSheetMode('transfer'); setSheetPreset(null); setOpenKey((k) => k + 1); setSheetOpen(true); };
+  const openInput = (preset = null) => { setSheetMode('tx'); setSheetPreset(preset); setEditTx(null); setOpenKey((k) => k + 1); setSheetOpen(true); };
+  const openFixed = () => { setSheetMode('fixed'); setSheetPreset(null); setEditTx(null); setOpenKey((k) => k + 1); setSheetOpen(true); };
+  const openTransfer = () => { setSheetMode('transfer'); setSheetPreset(null); setEditTx(null); setOpenKey((k) => k + 1); setSheetOpen(true); };
   const closeSheet = () => setSheetOpen(false);
+  // 기록 탭 행 탭 → 수정 진입. 매출은 수수료 로직이 있는 전용 모달로 라우팅.
+  const openEditTx = (t) => {
+    if (t.flow === 'income' && t.category === '매출') {
+      setSalesEdit({ id: t.id, original: t.amount, name: t.memo || '', date: t.date, type: t.method });
+      return;
+    }
+    setSheetMode('tx'); setSheetPreset(null); setEditTx(t); setOpenKey((k) => k + 1); setSheetOpen(true);
+  };
 
   const saveTx = async (payload) => {
     const row = await ledger.addTransaction(payload);
@@ -90,6 +101,12 @@ export default function Ledger({ user }) {
   const updateSales = async ({ id, method, amount, memo, date }) => {
     const row = await ledger.updateTransaction({ id, flow: 'income', category: '매출', method, amount, memo, date });
     if (row) notify('매출 수정!');
+  };
+  // 기록 탭 행 탭 → 수정 저장(지출·급여·기타수입). 매출은 openEditTx 에서 SalesInputModal 로 분기됨.
+  const updateTx = async (payload) => {
+    const row = await ledger.updateTransaction(payload);
+    closeSheet(); setEditTx(null);
+    if (row) notify('수정했어요');
   };
   const askDeleteTx = (id) => setConfirmDelete(id);
   const doDeleteTx = async () => {
@@ -166,7 +183,7 @@ export default function Ledger({ user }) {
         <SalesScreen transactions={transactions} onAdd={addSales} onUpdate={updateSales} onDelete={askDeleteTx} />
       )}
       {tab === 'income' && <IncomeScreen transactions={monthTx} onAddIncome={openInput} />}
-      {tab === 'records' && <RecordsScreen transactions={transactions} budgets={bmap} onDelete={askDeleteTx} />}
+      {tab === 'records' && <RecordsScreen transactions={transactions} budgets={bmap} onDelete={askDeleteTx} onEdit={openEditTx} />}
       {tab === 'settings' && (
         <SettingsScreen categories={categories} budgets={bmap} member={member} onNav={onNav}
           onSetBudget={ledger.setBudget} onAddCategory={ledger.addCategory} onDeleteCategory={ledger.deleteCategory} onLogout={() => setConfirmLogout(true)} />
@@ -177,8 +194,14 @@ export default function Ledger({ user }) {
       {report && <MonthlyReport report={report} onClose={closeReport} onSeeAnalysis={seeReportAnalysis} />}
 
       <InputSheet key={openKey} mode={sheetMode} preset={sheetPreset}
-        categories={categories} member={member} onClose={closeSheet}
-        onSaveTx={saveTx} onSaveFixed={saveFixed} onSaveTransfer={saveTransfer} notify={notify} />
+        categories={categories} member={member} editTx={editTx} onClose={closeSheet}
+        onSaveTx={saveTx} onUpdateTx={updateTx} onSaveFixed={saveFixed} onSaveTransfer={saveTransfer} notify={notify} />
+
+      {salesEdit && (
+        <SalesInputModal key={`rec-edit-${salesEdit.id}`} isOpen type={salesEdit.type}
+          initialData={salesEdit} onClose={() => setSalesEdit(null)}
+          onSave={(type, amount, name, dateISO) => updateSales({ id: salesEdit.id, method: type, amount, memo: name, date: dateISO })} />
+      )}
 
       <ConfirmDialog open={confirmLogout} title="로그아웃할까요?" confirmLabel="로그아웃"
         onConfirm={() => { setConfirmLogout(false); logout(); }} onCancel={() => setConfirmLogout(false)} />
