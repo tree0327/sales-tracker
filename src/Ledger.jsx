@@ -77,7 +77,6 @@ export default function Ledger({ user }) {
     closeSheet();
     if (row) {
       notify(`${payload.flow === 'expense' ? '지출' : payload.category === '급여' ? '급여' : '수입'} 저장!`);
-      setTab('home');
     }
   };
   const saveFixed = async (payload) => {
@@ -173,7 +172,7 @@ export default function Ledger({ user }) {
       {error && <div className="status-banner error">문제가 발생했습니다: {error}</div>}
       {loading && <div className="status-banner info">동기화 중…</div>}
 
-      {tab === 'home' && <HomeScreen member={member} flow={flow} monthLabel={MONTH_LABEL} overallBudget={overallBudget} onNav={onNav} onLogout={() => setConfirmLogout(true)} />}
+      {tab === 'home' && <HomeScreen member={member} flow={flow} monthLabel={MONTH_LABEL} overallBudget={overallBudget} jointBalance={jointStat.balance} onNav={onNav} onLogout={() => setConfirmLogout(true)} />}
       {tab === 'expense' && (
         <ExpenseScreen transactions={monthTx} fixed={fixed} activeTab={expenseTab} onTab={setExpenseTab}
           onNav={onNav} onAddFixed={openFixed} onDeleteFixed={ledger.deleteFixed}

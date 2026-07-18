@@ -44,7 +44,7 @@ function MenuCard({ icon, iconCls, name, amount, color, onClick }) {
 }
 
 // 홈: 현재 잔액(랜딩) + 흐름 계산 + 대메뉴
-export default function HomeScreen({ member, flow, monthLabel, overallBudget, onNav, onLogout }) {
+export default function HomeScreen({ member, flow, monthLabel, overallBudget, jointBalance, onNav, onLogout }) {
   const b = flow.balance;
   return (
     <div>
@@ -77,6 +77,7 @@ export default function HomeScreen({ member, flow, monthLabel, overallBudget, on
 
         <MenuCard icon="⟳" iconCls="fx-ic" name="고정지출" amount={`−${fmt(flow.fixed)}원`} color="var(--err-fg)" onClick={() => onNav('expense', '고정')} />
         <MenuCard icon="−" iconCls="ex-ic" name="지출관리" amount={`−${fmt(flow.expense)}원`} color="var(--err-fg)" onClick={() => onNav('expense', 'joint')} />
+        <MenuCard icon="◎" iconCls="fx-ic" name="공금 통장" amount={`${fmt(jointBalance)}원`} color="var(--fg)" onClick={() => onNav('expense', 'joint')} />
         <MenuCard icon="＋" iconCls="in-ic" name="매출관리" amount={`+${fmt(flow.salon)}원`} color="var(--ok-fg)" onClick={() => onNav('sales')} />
         <MenuCard icon="＋" iconCls="in-ic" name="급여관리" amount={`+${fmt(flow.salary)}원`} color="var(--ok-fg)" onClick={() => onNav('income')} />
       </div>
