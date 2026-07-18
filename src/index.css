@@ -1,35 +1,35 @@
-/* 디자인 토큰 — 흑백 미니멀. DESIGN.md 기준을 이 프로젝트(Vite+순수CSS)에 번역해 적용.
-   색은 의미가 있을 때만(수입/지출·상태) 쓰고, 나머지 위계는 투명도 그레이로만 표현한다.
-   다크모드는 지원하지 않는다(라이트 고정). */
+/* 디자인 토큰 — Apple(iOS HIG) 계열. 그룹 배경 위 보더 없는 흰 인셋 카드,
+   파랑 틴트(--accent)가 인터랙션을, 초록/빨강이 수입/지출을 표시한다.
+   위계는 투명도 그레이로. 다크모드는 지원하지 않는다(라이트 고정). */
 :root {
   color-scheme: light;
 
-  --bg: #ffffff;
-  /* 페이지 배경. 흰 카드와 2톤 레이어링으로 깊이감을 만든다 — 리팩토링 전 웜톤 레이아웃의
-     장점(배경 위에 카드가 떠 보임)을 흑백으로 이식한 것. 2026-07-18 사용자 결정. */
-  --paper: #f4f4f5;
+  /* Apple(iOS HIG) 계열 팔레트 — 2026-07-18 사용자 요청.
+     systemGroupedBackground 위 흰 인셋 카드, 파랑 틴트가 인터랙션을 표시한다.
+     단 iOS 순정 색(systemBlue #007AFF 4.0:1, systemRed #FF3B30 3.3:1)은 AA 미달이라
+     같은 계열의 접근성 변형을 쓴다. 틴트는 연회색 칩(--fill) 위에서도 4.5:1 을
+     넘겨야 해서 #0071E3(4.09:1 미달)이 아닌 #0066CC(5.27:1)다. 실측 검증됨. */
+  --bg: #ffffff;                       /* 카드 (secondarySystemGroupedBackground) */
+  --paper: #F2F2F7;                    /* 페이지 (systemGroupedBackground) */
   --fg: #171717;
   --fg-2: rgba(0, 0, 0, .6);
-  /* DESIGN.md §3은 캡션을 black/40~50 으로 규정하지만 흰 배경에서 2.85~3.95:1 로 AA 미달이다.
-     §8의 "black/40 밑으로 내려가지 말 것"(하한)은 지키면서 4.74:1 로 올린 값. */
+  /* 캡션·메타. black/40~50 은 AA 미달이라 4.74:1 로 올린 값 — 내리지 말 것. */
   --fg-3: rgba(0, 0, 0, .55);
-  --line: rgba(0, 0, 0, .1);
-  --fill: rgba(0, 0, 0, .05);
+  --line: rgba(60, 60, 67, .18);       /* separator */
+  --fill: rgba(120, 120, 128, .12);    /* tertiarySystemFill — 칩·세그먼트 트랙 */
 
-  --accent: #171717;          /* 뉴트럴 1차 CTA */
-  --accent-primary: #2563eb;  /* 가장 중요한 액션 */
-  --accent-2: #27272a;        /* 보조 액션 */
-  --on-accent: #ffffff;       /* 위 액센트 배경 위 글씨 */
+  --accent: #0066CC;                   /* 틴트(파랑) — CTA·활성 상태·링크 */
+  --on-accent: #ffffff;
 
-  --ok-bg: #f0fdf4;   --ok-fg: #15803d;    /* 수입·성공 */
-  --err-bg: #fef2f2;  --err-fg: #b91c1c;   /* 지출·오류 */
+  --ok-bg: #f0fdf4;   --ok-fg: #15803d;    /* 수입·성공 (green 계열 AA) */
+  --err-bg: #fef2f2;  --err-fg: #D70015;   /* 지출·오류 (systemRed 접근성 변형) */
   --warn-bg: #fef3c7; --warn-fg: #b45309;  /* 경고 */
   --info-bg: #dbeafe; --info-fg: #1d4ed8;  /* 정보 */
 
   /* 라운드 3단계 고정. 이 외의 값 사용 금지. */
   --r-sm: 4px;   /* 뱃지·태그 */
   --r-md: 12px;  /* 버튼·입력·알림박스 */
-  --r-lg: 20px;  /* 카드·패널·모달 — 예전 레이아웃의 둥근 맛 복귀(16→20, 사용자 결정) */
+  --r-lg: 16px;  /* 카드·패널·모달 — iOS 인셋 그룹 카드 톤 */
 
   /* 그림자 2단계: 카드 = sm, 떠 있는 표면(모달·시트) = 기본 */
   --shadow: 0 1px 2px rgba(0, 0, 0, .04), 0 10px 30px rgba(0, 0, 0, .08);
@@ -51,18 +51,18 @@ button, input { font-family: inherit; }
 .app { max-width: var(--maxw); margin: 0 auto; min-height: 100vh; position: relative; background: var(--paper); padding-bottom: 84px; }
 
 .app-head { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; padding: 16px 16px 12px; background: linear-gradient(var(--paper) 72%, transparent); }
-.app-head .title { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 18px; cursor: pointer; background: none; border: none; color: var(--fg); }
+.app-head .title { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 26px; letter-spacing: -.02em; cursor: pointer; background: none; border: none; color: var(--fg); }
 .app-head .hd-r { display: flex; align-items: center; gap: 8px; }
 .chev { color: var(--fg-3); font-size: 15px; }
 .mnav { display: inline-flex; align-items: center; gap: 16px; font-weight: 700; font-size: 18px; }
 .mnav button { background: none; border: none; color: var(--fg-3); font-size: 22px; cursor: pointer; padding: 0 4px; }
-.icn { width: 48px; height: 48px; border-radius: var(--r-md); background: var(--bg); border: 1px solid var(--line); display: grid; place-items: center; color: var(--fg-2); font-size: 16px; cursor: pointer; }
-.userchip { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; padding: 8px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); color: var(--fg-2); cursor: pointer; min-height: 48px; }
+.icn { width: 48px; height: 48px; border-radius: var(--r-md); background: var(--bg); border: none; display: grid; place-items: center; color: var(--fg-2); font-size: 16px; cursor: pointer; }
+.userchip { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; padding: 8px 12px; border-radius: 999px; border: none; background: var(--bg); color: var(--fg-2); cursor: pointer; min-height: 48px; }
 .userchip .av { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 700; background: var(--fill); color: var(--fg); }
 
 .body { padding: 4px 16px 16px; }
 
-.central { background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 24px 16px 16px; }
+.central { background: var(--bg); border-radius: var(--r-lg); padding: 24px 16px 16px; }
 .central .cap { font-size: 13px; color: var(--fg-2); font-weight: 700; }
 .central .bal { font-size: 40px; font-weight: 700; letter-spacing: -.025em; margin: 4px 0 4px; }
 .central .bal .won { font-size: 20px; color: var(--fg-2); margin-left: 4px; font-weight: 700; }
@@ -80,7 +80,7 @@ button, input { font-family: inherit; }
 .fr.total .k { color: var(--fg); font-weight: 700; font-size: 14px; }
 .fr.total .v { font-size: 22px; font-weight: 700; }
 
-.menu-card { display: flex; align-items: center; justify-content: space-between; width: 100%; text-align: left; background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px; margin-top: 12px; cursor: pointer; min-height: 48px; }
+.menu-card { display: flex; align-items: center; justify-content: space-between; width: 100%; text-align: left; background: var(--bg); border: none; border-radius: var(--r-lg); padding: 16px; margin-top: 12px; cursor: pointer; min-height: 48px; }
 .menu-card .name { font-size: 15px; font-weight: 700; color: var(--fg); display: flex; align-items: center; gap: 8px; }
 .menu-card .name .ic { width: 28px; height: 28px; border-radius: var(--r-md); display: grid; place-items: center; font-size: 15px; }
 .ic.ex-ic { background: var(--err-bg); color: var(--err-fg); }
@@ -92,25 +92,25 @@ button, input { font-family: inherit; }
 .sec-title { font-size: 13px; font-weight: 700; color: var(--fg-2); margin: 20px 4px 8px; display: flex; justify-content: space-between; align-items: baseline; }
 .sec-title .r { color: var(--fg-3); font-weight: 700; font-size: 12px; }
 
-.mini-hero { background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px; margin-top: 12px; display: flex; align-items: flex-end; justify-content: space-between; }
+.mini-hero { background: var(--bg); border-radius: var(--r-lg); padding: 16px; margin-top: 12px; display: flex; align-items: flex-end; justify-content: space-between; }
 .mini-hero .k { font-size: 12px; color: var(--fg-2); font-weight: 700; display: flex; align-items: center; gap: 8px; }
 .mini-hero .v { font-size: 26px; font-weight: 700; margin-top: 4px; letter-spacing: -.02em; }
 .mini-hero .r { text-align: right; font-size: 12px; color: var(--fg-3); font-weight: 500; }
 .mini-hero .r b { color: var(--fg-2); }
 .unit { margin-left: 2px; font-size: 14px; color: var(--fg-2); }
 
-.seg { display: flex; background: var(--fill); border: 1px solid var(--line); border-radius: var(--r-md); padding: 4px; gap: 4px; }
+.seg { display: flex; background: var(--fill); border-radius: var(--r-md); padding: 4px; gap: 4px; }
 .seg .s { flex: 1; text-align: center; padding: 12px 4px; border-radius: var(--r-md); font-size: 12px; font-weight: 700; color: var(--fg-2); cursor: pointer; border: none; background: none; min-height: 48px; }
-.seg .s.on { background: var(--bg); color: var(--fg); }
+.seg .s.on { background: var(--bg); color: var(--fg); box-shadow: var(--shadow-sm); }
 .seg .s.on.fx { background: var(--err-fg); color: var(--on-accent); }
 .seg .s.on.ex { background: var(--err-fg); color: var(--on-accent); } .seg .s.on.in { background: var(--ok-fg); color: var(--on-accent); }
 
 .filterbar { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
 .fchips { display: flex; gap: 8px; overflow-x: auto; flex: 1; scrollbar-width: none; }
 .fchips::-webkit-scrollbar { height: 0; }
-.fchip { font-size: 12px; font-weight: 700; padding: 8px 12px; border-radius: 999px; background: var(--fill); border: 1px solid var(--line); color: var(--fg-2); cursor: pointer; white-space: nowrap; }
-.fchip.on { background: var(--fill); border-color: var(--accent); color: var(--fg); }
-.gran { display: flex; background: var(--fill); border: 1px solid var(--line); border-radius: 999px; padding: 4px; flex: none; }
+.fchip { font-size: 12px; font-weight: 700; padding: 8px 12px; border-radius: 999px; background: var(--fill); border: none; color: var(--fg-2); cursor: pointer; white-space: nowrap; }
+.fchip.on { background: var(--accent); color: var(--on-accent); }
+.gran { display: flex; background: var(--fill); border: none; border-radius: 999px; padding: 4px; flex: none; }
 .gran .g { font-size: 12px; font-weight: 700; padding: 8px 12px; border-radius: 999px; color: var(--fg-2); cursor: pointer; border: none; background: none; }
 .gran .g.on { background: var(--bg); color: var(--fg); }
 
@@ -140,9 +140,10 @@ button, input { font-family: inherit; }
 .tx .del { background: none; border: none; color: var(--fg-3); font-size: 17px; padding: 4px 4px 4px 8px; cursor: pointer; }
 .empty { text-align: center; color: var(--fg-3); font-size: 13px; padding: 32px 12px; line-height: 1.7; }
 
-.add-row { margin-top: 12px; width: 100%; padding: 16px; border-radius: var(--r-md); border: 2px dashed var(--fg-2); color: var(--fg-2); font-size: 13px; font-weight: 700; text-align: center; background: transparent; cursor: pointer; min-height: 48px; }
+/* iOS 그룹 리스트의 액션 로우 — 흰 카드에 틴트 색 라벨 */
+.add-row { margin-top: 12px; width: 100%; padding: 16px; border-radius: var(--r-lg); border: none; background: var(--bg); color: var(--accent); box-shadow: var(--shadow-sm); font-size: 14px; font-weight: 700; text-align: center; cursor: pointer; min-height: 48px; }
 
-.set-card { background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px; margin-top: 12px; }
+.set-card { background: var(--bg); border-radius: var(--r-lg); padding: 16px; margin-top: 12px; }
 .set-card h3 { font-size: 13px; font-weight: 700; margin: 0 0 4px; }
 .set-card .desc { font-size: 12px; color: var(--fg-3); margin: 0 0 12px; }
 .catlist { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -151,7 +152,7 @@ button, input { font-family: inherit; }
 .addcat { display: flex; gap: 8px; margin-top: 12px; }
 .addcat input { flex: 1; border: 1px solid var(--line); background: var(--fill); border-radius: var(--r-md); padding: 12px; font-size: 14px; color: var(--fg); }
 .addcat button { border: none; background: var(--accent); color: var(--on-accent); font-weight: 700; font-size: 13px; padding: 0 20px; border-radius: var(--r-md); cursor: pointer; }
-.set-logout { width: 100%; margin-top: 4px; padding: 16px; border-radius: var(--r-md); border: 1px solid var(--line); background: var(--fill); color: var(--err-fg); font-weight: 700; font-size: 14px; cursor: pointer; }
+.set-logout { width: 100%; margin-top: 4px; padding: 16px; border-radius: var(--r-md); border: none; background: var(--bg); color: var(--err-fg); font-weight: 700; font-size: 14px; cursor: pointer; }
 
 .status-banner { margin: 12px 16px 0; padding: 12px 16px; border-radius: var(--r-md); font-size: 13px; font-weight: 500; }
 .status-banner.error { background: var(--err-bg); color: var(--err-fg); }
@@ -163,7 +164,7 @@ button, input { font-family: inherit; }
 
 .tabbar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: var(--maxw); height: 64px; background: color-mix(in srgb, var(--paper) 94%, transparent); backdrop-filter: blur(10px); border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-around; padding: 0 8px 4px; z-index: 20; }
 .tabbar .tb { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; color: var(--fg-3); flex: 1; cursor: pointer; background: none; border: none; min-height: 48px; }
-.tabbar .tb.active { color: var(--fg); }
+.tabbar .tb.active { color: var(--accent); }
 .tabbar .tb i { font-style: normal; font-size: 17px; line-height: 1; }
 .fab { width: 56px; height: 56px; border-radius: var(--r-lg); background: var(--accent); color: var(--on-accent); display: grid; place-items: center; font-size: 28px; font-weight: 300; margin-top: -24px; flex: none; cursor: pointer; border: none; min-height: 56px; }
 
@@ -180,7 +181,7 @@ button, input { font-family: inherit; }
 .login .lmsg.error { color: var(--err-fg); }
 
 .scrim { position: fixed; inset: 0; background: rgba(0, 0, 0, .42); opacity: 0; pointer-events: none; transition: opacity .22s; z-index: 40; }
-.sheet { position: fixed; left: 50%; bottom: 0; transform: translateX(-50%) translateY(102%); width: 100%; max-width: var(--maxw); z-index: 41; background: var(--bg); border-radius: var(--r-lg) var(--r-lg) 0 0; border: 1px solid var(--line); border-bottom: none; box-shadow: var(--shadow-sm); transition: transform .26s cubic-bezier(.32,.72,.32,1); max-height: 92vh; overflow-y: auto; padding: 8px 20px 24px; }
+.sheet { position: fixed; left: 50%; bottom: 0; transform: translateX(-50%) translateY(102%); width: 100%; max-width: var(--maxw); z-index: 41; background: var(--bg); border-radius: var(--r-lg) var(--r-lg) 0 0; box-shadow: var(--shadow-sm); transition: transform .26s cubic-bezier(.32,.72,.32,1); max-height: 92vh; overflow-y: auto; padding: 8px 20px 24px; }
 .sheet::-webkit-scrollbar { width: 0; }
 .sheet-open .scrim { opacity: 1; pointer-events: auto; }
 .sheet-open .sheet { transform: translateX(-50%) translateY(0); }
@@ -193,18 +194,18 @@ button, input { font-family: inherit; }
 .fee-line { text-align: right; font-size: 12px; color: var(--fg-2); font-weight: 500; margin: -4px 4px 0; min-height: 16px; }
 .fee-line b { color: var(--ok-fg); }
 .quick { display: flex; gap: 8px; margin-top: 12px; }
-.quick button { flex: 1; padding: 12px 4px; border-radius: var(--r-md); border: 1px solid var(--line); background: var(--fill); color: var(--fg-2); font-size: 12px; font-weight: 700; cursor: pointer; }
+.quick button { flex: 1; padding: 12px 4px; border-radius: var(--r-md); border: none; background: var(--fill); color: var(--fg-2); font-size: 12px; font-weight: 700; cursor: pointer; }
 .field-lab { font-size: 12px; font-weight: 700; color: var(--fg-2); margin: 16px 4px 8px; display: flex; align-items: center; gap: 8px; }
 .field-lab .auto { font-size: 11px; font-weight: 700; color: var(--fg); background: var(--fill); padding: 2px 8px; border-radius: var(--r-sm); }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.chip { font-size: 12px; font-weight: 500; padding: 8px 16px; border-radius: 999px; background: var(--fill); border: 1px solid var(--line); color: var(--fg-2); cursor: pointer; }
-.chip.on { background: var(--fill); border-color: var(--accent); color: var(--fg); }
+.chip { font-size: 12px; font-weight: 500; padding: 8px 16px; border-radius: 999px; background: var(--fill); border: none; color: var(--fg-2); cursor: pointer; }
+.chip.on { background: var(--accent); color: var(--on-accent); }
 .who { display: flex; gap: 8px; }
 .who .w2 { flex: 1; text-align: center; padding: 12px; border-radius: var(--r-md); font-size: 13px; font-weight: 700; border: 1.5px solid var(--line); background: var(--fill); color: var(--fg-2); cursor: pointer; }
 .who .w2.on { border-color: var(--fg); background: var(--fill); color: var(--fg); }
 .memo-input { width: 100%; border: 1px solid var(--line); background: var(--fill); border-radius: var(--r-md); padding: 12px 16px; font-size: 14px; color: var(--fg); }
 .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 16px; }
-.key { text-align: center; padding: 16px; font-size: 20px; font-weight: 700; border-radius: var(--r-md); background: var(--fill); border: 1px solid var(--line); cursor: pointer; user-select: none; color: var(--fg); }
+.key { text-align: center; padding: 16px; font-size: 20px; font-weight: 700; border-radius: var(--r-md); background: var(--fill); border: none; cursor: pointer; user-select: none; color: var(--fg); }
 .key:active { background: var(--fill); }
 .save { margin-top: 16px; width: 100%; padding: 16px; border-radius: var(--r-lg); background: var(--accent); color: var(--on-accent); font-size: 15px; font-weight: 700; text-align: center; cursor: pointer; border: none; min-height: 56px; }
 
@@ -213,7 +214,7 @@ button, input { font-family: inherit; }
 
 /* month-end report modal */
 .modal-scrim { position: fixed; inset: 0; background: rgba(0, 0, 0, .5); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 24px; }
-.modal { background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 24px 24px 20px; width: 100%; max-width: 360px; box-shadow: var(--shadow-sm); text-align: center; }
+.modal { background: var(--bg); border-radius: var(--r-lg); padding: 24px 24px 20px; width: 100%; max-width: 360px; box-shadow: var(--shadow-sm); text-align: center; }
 .modal .m-emoji { font-size: 32px; }
 .modal h3 { font-size: 18px; font-weight: 700; margin: 8px 0 16px; letter-spacing: -.01em; }
 .report-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 14px; font-weight: 500; color: var(--fg-2); }
@@ -227,7 +228,7 @@ button, input { font-family: inherit; }
 
 /* 매출 입력/수정 모달 (SalesInputModal) 등 폼형 모달 공용 패턴.
    .modal-scrim 은 위 월말 리포트 모달과 공유(중복 정의 안 함). */
-.modal-card { width: 100%; max-width: 384px; background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 24px; box-shadow: var(--shadow-sm); max-height: 90dvh; overflow-y: auto; }
+.modal-card { width: 100%; max-width: 384px; background: var(--bg); border: none; border-radius: var(--r-lg); padding: 24px; box-shadow: var(--shadow-sm); max-height: 90dvh; overflow-y: auto; }
 .modal-title { margin: 0 0 16px; font-size: 16px; font-weight: 700; }
 .field { display: block; margin-bottom: 16px; }
 .field-label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; }
@@ -238,7 +239,7 @@ button, input { font-family: inherit; }
 .msg.ok { background: var(--ok-bg); color: var(--ok-fg); }
 .modal-actions { display: flex; gap: 12px; margin-top: 24px; }
 .btn-ghost, .btn-primary { flex: 1; min-height: 48px; border-radius: var(--r-md); font-size: 16px; font-weight: 500; cursor: pointer; transition: background-color .15s; }
-.btn-ghost { border: 1px solid var(--line); background: var(--bg); color: var(--fg); }
+.btn-ghost { border: none; background: var(--fill); color: var(--fg); }
 .btn-ghost:hover { background: var(--fill); }
 .btn-primary { border: none; background: var(--accent); color: var(--on-accent); }
 .btn-primary:hover { background: rgba(23,23,23,.8); }
@@ -258,21 +259,21 @@ button, input { font-family: inherit; }
 .rec-amt { display: block; font-size: 14px; font-weight: 700; }
 .rec-org { display: block; font-size: 12px; color: var(--fg-3); }
 .rec-actions { display: flex; gap: 8px; width: 100%; justify-content: flex-end; }
-.btn-mini { min-height: 48px; padding: 0 12px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--bg); color: var(--fg-2); font-size: 12px; cursor: pointer; }
+.btn-mini { min-height: 48px; padding: 0 12px; border: none; border-radius: var(--r-md); background: var(--fill); color: var(--accent); font-size: 12px; cursor: pointer; }
 .btn-mini.danger { color: var(--err-fg); }
 
 /* 매출관리 탭 (SalesScreen) */
 .sales-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
-.sq-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; min-height: 112px; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--bg); color: var(--fg); font-size: 16px; font-weight: 500; cursor: pointer; transition: background-color .15s; }
+.sq-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; min-height: 112px; border: none; border-radius: var(--r-lg); background: var(--bg); color: var(--fg); font-size: 16px; font-weight: 500; cursor: pointer; transition: background-color .15s; }
 .sq-btn:hover { background: var(--fill); }
 .sq-icon { font-size: 32px; line-height: 1; }
 .sales-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px; }
-.sum-card { background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px; }
+.sum-card { background: var(--bg); border-radius: var(--r-lg); padding: 16px; }
 .sum-label { display: block; font-size: 12px; color: var(--fg-2); }
 .sum-label em { color: var(--fg-3); font-style: normal; }
 .sum-value { display: block; margin-top: 8px; font-size: 20px; font-weight: 700; }
 .sum-value em { margin-left: 2px; font-size: 12px; font-style: normal; color: var(--fg-2); }
-.sales-total { display: block; width: 100%; text-align: left; margin-top: 24px; border: 1px solid var(--line); border-radius: var(--r-lg); padding: 24px; background: var(--bg); cursor: pointer; transition: background-color .15s; }
+.sales-total { display: block; width: 100%; text-align: left; margin-top: 24px; border: none; border-radius: var(--r-lg); padding: 24px; background: var(--bg); cursor: pointer; transition: background-color .15s; }
 .sales-total:hover { background: var(--fill); }
 .st-period { display: block; font-size: 12px; color: var(--fg-3); }
 .st-label { display: block; margin-top: 8px; font-size: 14px; color: var(--fg-2); }
@@ -283,10 +284,10 @@ button, input { font-family: inherit; }
 
 /* 매출관리 탭 정체성 — 가계부 화면들과 구분되는 검정 인버트 헤더.
    현금(주 결제수단)은 검정 채움, 카드는 아웃라인으로 무게 차등. */
-.sales-head { background: var(--fg); }
+.sales-head { background: var(--accent); }
 .sales-head .title { color: var(--on-accent); cursor: default; }
-.sq-btn.fill { background: var(--fg); color: var(--on-accent); }
-.sq-btn.fill:hover { background: rgba(23, 23, 23, .85); }
+.sq-btn.fill { background: var(--accent); color: var(--on-accent); }
+.sq-btn.fill:hover { background: #0052A3; }
 /* 매출 탭의 '전체 기록 보기'만 섹션 리듬(24px)에 맞춘다 — 다른 화면의 .add-row 는 그대로. */
 .sales-total + .add-row { margin-top: 24px; }
 
@@ -297,9 +298,9 @@ button, input { font-family: inherit; }
 
 /* 매출 기록 모달 — 결제수단 필터(전체/현금/카드)와 월별 아코디언 (예전 매출앱 포맷 복원) */
 .rec-filter { display: flex; gap: 8px; margin: 4px 0 8px; }
-.rf { flex: 1; min-height: 48px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--bg); color: var(--fg-2); font-size: 13px; font-weight: 700; cursor: pointer; transition: background-color .15s; }
-.rf.on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
-.macc { border: 1px solid var(--line); border-radius: var(--r-md); margin-top: 8px; overflow: hidden; background: var(--bg); }
+.rf { flex: 1; min-height: 48px; border: none; border-radius: var(--r-md); background: var(--fill); color: var(--fg-2); font-size: 13px; font-weight: 700; cursor: pointer; transition: background-color .15s; }
+.rf.on { background: var(--accent); color: var(--on-accent); }
+.macc { border-radius: var(--r-md); margin-top: 8px; overflow: hidden; background: var(--bg); }
 .macc-head { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 56px; padding: 12px 16px; border: none; background: none; cursor: pointer; text-align: left; }
 .macc-head:hover { background: var(--fill); }
 .macc-chev { color: var(--fg-3); font-size: 12px; flex: none; }
