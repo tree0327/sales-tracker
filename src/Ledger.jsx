@@ -45,6 +45,7 @@ export default function Ledger({ user }) {
   const [toast, setToast] = useState('');
   const toastTimer = useRef(null);
   const notify = useCallback((msg) => {
+    setUndoTx(null); // 새 알림이 뜨면 직전 삭제의 실행취소 기회는 닫는다(버튼이 엉뚱한 메시지에 붙는 것 방지)
     setToast(msg);
     clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setToast(''), 1700);
