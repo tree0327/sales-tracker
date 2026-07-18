@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase, TX_TABLE, FIXED_TABLE, CATEGORY_TABLE, BUDGET_TABLE } from '../supabaseClient';
 import { computeFinal, buildUpdatePatch } from '../utils/money';
+import { applyRealtimeEvent } from '../utils/realtimeMerge';
 
 // 부부 가계부 데이터 계층.
 // transactions / fixed_expenses / expense_categories 를 로드하고 추가·삭제한다.
@@ -43,6 +44,24 @@ export function useLedger() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     reload();
   }, [reload]);
+
+  // 배우자 기기의 입력·수정·삭제를 실시간 반영. 자기 발신 이벤트는 id 멱등 병합이라 안전.
+  // 마운트 1회만 구독하고(빈 deps) cleanup 에서 반드시 채널을 제거해 리렌더마다 누적되지 않게 한다.
+  // Supabase 프로젝트에서 supabase/migrations/0010_realtime.sql 을 실행하지 않으면
+  // 이 채널은 그냥 아무 이벤트도 받지 못한 채 조용히 대기한다(앱은 기존처럼 정상 동작).
+  useEffect(() => {
+    const ch = supabase.channel('ledger-sync')
+      .on('postgres_changes', { event: '*', schema: 'public', table: TX_TABLE },
+        (e) => setTransactions((prev) => applyRealtimeEvent(prev, e, { sortByDateDesc: true })))
+      .on('postgres_changes', { event: '*', schema: 'public', table: FIXED_TABLE },
+        (e) => setFixed((prev) => applyRealtimeEvent(prev, e)))
+      .on('postgres_changes', { event: '*', schema: 'public', table: CATEGORY_TABLE },
+        (e) => setCategories((prev) => applyRealtimeEvent(prev, e)))
+      .on('postgres_changes', { event: '*', schema: 'public', table: BUDGET_TABLE },
+        (e) => setBudgets((prev) => applyRealtimeEvent(prev, e)))
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, []);
 
   // --- 거래 추가 ---
   const addTransaction = useCallback(async ({ flow, amount, category, owner, method, memo, date }) => {
