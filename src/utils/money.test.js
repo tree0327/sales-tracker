@@ -70,4 +70,20 @@ describe('buildUpdatePatch', () => {
     });
     expect(patch.method).toBe('카드');
   });
+
+  it('owner 를 넘기면 패치에 포함한다 (수정 시트의 소유자 변경)', () => {
+    const patch = buildUpdatePatch({
+      flow: 'expense', category: '식비', method: '카드',
+      amount: 12000, memo: '', date: '2026-07-16T03:00:00Z', owner: 'joint',
+    });
+    expect(patch.owner).toBe('joint');
+  });
+
+  it('owner 를 안 넘기면 패치에 owner 키 자체가 없다 (매출 수정 경로 — 소유자 불변)', () => {
+    const patch = buildUpdatePatch({
+      flow: 'income', category: '매출', method: '카드',
+      amount: 100000, memo: '', date: '2026-07-16T03:00:00Z',
+    });
+    expect('owner' in patch).toBe(false);
+  });
 });

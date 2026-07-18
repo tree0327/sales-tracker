@@ -30,12 +30,17 @@ export function computeFinal({ flow, category, method, amount }) {
 
 // 거래 수정 시 DB에 보낼 패치. addTransaction 의 payload 규칙과 동일해야 한다
 // — final 재계산과 급여→계좌 강제 둘 다. 어긋나면 추가와 수정의 결과가 갈린다.
-export function buildUpdatePatch({ flow, category, method, amount, memo, date }) {
-  return {
+export function buildUpdatePatch({ flow, category, method, amount, memo, date, owner }) {
+  const patch = {
     amount: Number(amount) || 0,
     final: computeFinal({ flow, category, method, amount }),
     method: flow === 'income' && category === '급여' ? '계좌' : method,
     memo: (memo || '').trim(),
     date,
   };
+  // owner 는 수정 시트가 명시적으로 넘길 때만 갱신한다.
+  // 안 넘기면(매출 수정 경로) DB의 기존 소유자를 건드리지 않는다 — undefined 를 patch 에
+  // 넣으면 supabase 가 null 로 덮어써 not null 제약에 걸린다.
+  if (owner !== undefined) patch.owner = owner;
+  return patch;
 }

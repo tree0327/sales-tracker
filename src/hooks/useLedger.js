@@ -63,8 +63,8 @@ export function useLedger() {
     return data;
   }, []);
 
-  const updateTransaction = useCallback(async ({ id, flow, category, method, amount, memo, date }) => {
-    const patch = buildUpdatePatch({ flow, category, method, amount, memo, date });
+  const updateTransaction = useCallback(async ({ id, flow, category, method, amount, memo, date, owner }) => {
+    const patch = buildUpdatePatch({ flow, category, method, amount, memo, date, owner });
     const snap = transactions;
     // 낙관적 갱신 후 실패하면 스냅샷으로 되돌린다(deleteTransaction 과 동일한 패턴).
     setTransactions((prev) => prev.map((t) => (t.id === id ? { ...t, ...patch } : t)));
