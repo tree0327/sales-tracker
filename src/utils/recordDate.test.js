@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildRecordDateISO, localYMD } from './recordDate.js';
+import { buildRecordDateISO, localYMD, resolveSheetDate } from './recordDate.js';
 
 describe('localYMD', () => {
   it('Date 를 로컬 기준 YYYY-MM-DD 로 만든다 (UTC 아님)', () => {
@@ -45,5 +45,33 @@ describe('buildRecordDateISO', () => {
     expect(dt.getDate()).toBe(1);
     expect(dt.getHours()).toBe(8);
     expect(dt.getMinutes()).toBe(5);
+  });
+});
+
+describe('resolveSheetDate', () => {
+  it("'오늘'은 현재 시각 그대로", () => {
+    const now = new Date(2026, 6, 18, 14, 30, 0);
+    const dt = new Date(resolveSheetDate('오늘', now));
+    expect(dt.getDate()).toBe(18);
+    expect(dt.getHours()).toBe(14); // 12시 고정 버그 회귀 방지
+  });
+  it("'어제'는 하루 전 + 현재 시각", () => {
+    const now = new Date(2026, 6, 18, 9, 5, 0);
+    const dt = new Date(resolveSheetDate('어제', now));
+    expect(dt.getDate()).toBe(17);
+    expect(dt.getHours()).toBe(9);
+  });
+  it('YYYY-MM-DD 는 그 날짜 + 현재 시각', () => {
+    const now = new Date(2026, 6, 18, 22, 45, 0);
+    const dt = new Date(resolveSheetDate('2026-07-01', now));
+    expect(dt.getMonth()).toBe(6);
+    expect(dt.getDate()).toBe(1);
+    expect(dt.getHours()).toBe(22);
+  });
+  it('월초로 어제가 지난달이면 달을 넘긴다', () => {
+    const now = new Date(2026, 7, 1, 10, 0, 0); // 8/1
+    const dt = new Date(resolveSheetDate('그저께', now));
+    expect(dt.getMonth()).toBe(6); // 7월
+    expect(dt.getDate()).toBe(30);
   });
 });

@@ -34,9 +34,19 @@ describe('buildUpdatePatch', () => {
       amount: 100000, memo: ' 염색 ', date: '2026-07-16T03:00:00Z',
     });
     expect(patch).toEqual({
+      flow: 'income', category: '매출',
       amount: 100000, final: 90000, method: '카드',
       memo: '염색', date: '2026-07-16T03:00:00Z',
     });
+  });
+
+  it('flow 와 category 도 패치에 포함한다 (수정 시트의 카테고리·유형 변경)', () => {
+    const patch = buildUpdatePatch({
+      flow: 'expense', category: '교통', method: '카드',
+      amount: 12000, memo: '', date: '2026-07-16T03:00:00Z', owner: 'wife',
+    });
+    expect(patch.flow).toBe('expense');
+    expect(patch.category).toBe('교통');
   });
 
   it('매출 현금은 원금 그대로다', () => {
@@ -69,5 +79,21 @@ describe('buildUpdatePatch', () => {
       amount: 100000, memo: '', date: '2026-07-16T03:00:00Z',
     });
     expect(patch.method).toBe('카드');
+  });
+
+  it('owner 를 넘기면 패치에 포함한다 (수정 시트의 소유자 변경)', () => {
+    const patch = buildUpdatePatch({
+      flow: 'expense', category: '식비', method: '카드',
+      amount: 12000, memo: '', date: '2026-07-16T03:00:00Z', owner: 'joint',
+    });
+    expect(patch.owner).toBe('joint');
+  });
+
+  it('owner 를 안 넘기면 패치에 owner 키 자체가 없다 (매출 수정 경로 — 소유자 불변)', () => {
+    const patch = buildUpdatePatch({
+      flow: 'income', category: '매출', method: '카드',
+      amount: 100000, memo: '', date: '2026-07-16T03:00:00Z',
+    });
+    expect('owner' in patch).toBe(false);
   });
 });

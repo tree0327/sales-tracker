@@ -8,7 +8,7 @@ const TODAY_KEY = (() => { const d = new Date(); return `${d.getMonth() + 1}/${d
 const dayLabel = (k) => (k === TODAY_KEY ? `오늘 · ${k}` : k);
 
 // 기록: 월 이동 + 필터(종류·소유자·결제수단) + 월별/일별
-export default function RecordsScreen({ transactions, budgets, onDelete }) {
+export default function RecordsScreen({ transactions, budgets, onDelete, onEdit }) {
   const now = new Date();
   const [mode, setMode] = useState('기록');       // 기록 | 분석
   const [month, setMonth] = useState(now.getMonth() + 1);
@@ -110,8 +110,8 @@ export default function RecordsScreen({ transactions, budgets, onDelete }) {
         )}
 
         {gran === '일별'
-          ? (activeDay && <DayGroup group={groups.find((g) => g.day === activeDay)} onDelete={onDelete} />)
-          : groups.map((g) => <DayGroup key={g.day} group={g} onDelete={onDelete} />)}
+          ? (activeDay && <DayGroup group={groups.find((g) => g.day === activeDay)} onDelete={onDelete} onEdit={onEdit} />)
+          : groups.map((g) => <DayGroup key={g.day} group={g} onDelete={onDelete} onEdit={onEdit} />)}
         </>
         )}
       </div>
@@ -119,7 +119,7 @@ export default function RecordsScreen({ transactions, budgets, onDelete }) {
   );
 }
 
-function DayGroup({ group, onDelete }) {
+function DayGroup({ group, onDelete, onEdit }) {
   if (!group) return null;
   const net = group.items.reduce((a, t) => a + signedAmount(t), 0);
   return (
@@ -128,7 +128,7 @@ function DayGroup({ group, onDelete }) {
         {dayLabel(group.day)}
         <span className="r num" style={{ color: net >= 0 ? 'var(--ok-fg)' : 'var(--fg-3)' }}>{net >= 0 ? '+' : '−'}{fmt(Math.abs(net))}</span>
       </div>
-      {group.items.map((t) => <TxRow key={t.id} tx={t} onDelete={onDelete} />)}
+      {group.items.map((t) => <TxRow key={t.id} tx={t} onDelete={onDelete} onEdit={onEdit} />)}
     </>
   );
 }

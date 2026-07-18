@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { fmt } from '../utils/money';
+import { resolveSheetDate, localYMD, buildRecordDateISO } from '../utils/recordDate';
 
 const INC_CATS = ['급여', '기타수입'];
 const WHO = [
@@ -10,14 +11,15 @@ const WHO = [
 const DATE_OPTS = ['오늘', '어제', '그저께'];
 const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '00', '0', '⌫'];
 
-function dateFromOpt(opt) {
-  const d = new Date();
-  d.setHours(12, 0, 0, 0);
-  if (opt === '어제') d.setDate(d.getDate() - 1);
-  if (opt === '그저께') d.setDate(d.getDate() - 2);
-  return d.toISOString();
-}
-function buildTx(preset, role) {
+function buildTx(preset, role, editTx) {
+  if (editTx) {
+    return {
+      flow: editTx.flow === 'expense' ? '지출' : '수입',
+      amount: String(editTx.amount || ''),
+      cat: editTx.category, who: editTx.owner, method: editTx.method,
+      memo: editTx.memo || '', date: localYMD(editTx.date), whoAuto: false,
+    };
+  }
   const base = { flow: '지출', amount: '', cat: null, who: role, method: '카드', memo: '', date: '오늘', whoAuto: true };
   if (preset === '급여') Object.assign(base, { flow: '수입', cat: '급여', who: 'husband', method: '계좌', whoAuto: false });
   return base;
@@ -43,8 +45,8 @@ function Shell({ onClose, children }) {
 
 // 입력 시트. mode='tx'(거래) | 'fixed'(고정지출).
 // 부모가 key={openKey} 로 리마운트시켜 매번 초기화한다.
-export default function InputSheet({ mode, preset, categories, member, onClose, onSaveTx, onSaveFixed, onSaveTransfer, notify }) {
-  const [tx, setTx] = useState(() => (mode === 'tx' ? buildTx(preset, member.role) : null));
+export default function InputSheet({ mode, preset, categories, member, editTx = null, onClose, onSaveTx, onUpdateTx, onSaveFixed, onSaveTransfer, notify }) {
+  const [tx, setTx] = useState(() => (mode === 'tx' ? buildTx(preset, member.role, editTx) : null));
   const [fx, setFx] = useState(() => (mode === 'fixed' ? { name: '', amount: '', method: '계좌' } : null));
   const [tr, setTr] = useState(() => (mode === 'transfer' ? { amount: '', who: member.role === 'joint' ? 'wife' : member.role, method: '계좌', memo: '', date: '오늘' } : null));
 
@@ -89,9 +91,10 @@ export default function InputSheet({ mode, preset, categories, member, onClose, 
 
   // ---- 공금 충전 폼 ----
   if (mode === 'transfer') {
+    const isCustomTrDate = /^\d{4}-\d{2}-\d{2}$/.test(tr.date);
     const saveTr = () => {
       if (!amt) return notify('금액을 입력해주세요');
-      onSaveTransfer({ amount: amt, who: tr.who, method: tr.method, memo: tr.memo, date: dateFromOpt(tr.date) });
+      onSaveTransfer({ amount: amt, who: tr.who, method: tr.method, memo: tr.memo, date: resolveSheetDate(tr.date) });
     };
     return (
       <Shell onClose={onClose}>
@@ -108,9 +111,16 @@ export default function InputSheet({ mode, preset, categories, member, onClose, 
           <button key={m} className={`chip ${tr.method === m ? 'on' : ''}`} onClick={() => setTr({ ...tr, method: m })}>{m}</button>
         ))}</div>
         <div className="field-lab">날짜</div>
-        <div className="chips">{DATE_OPTS.map((d) => (
-          <button key={d} className={`chip ${tr.date === d ? 'on' : ''}`} onClick={() => setTr({ ...tr, date: d })}>{d}</button>
-        ))}</div>
+        <div className="chips">
+          {DATE_OPTS.map((d) => (
+            <button key={d} className={`chip ${tr.date === d ? 'on' : ''}`} onClick={() => setTr({ ...tr, date: d })}>{d}</button>
+          ))}
+          <button className={`chip ${isCustomTrDate ? 'on' : ''}`} onClick={() => setTr({ ...tr, date: localYMD(new Date()) })}>달력</button>
+        </div>
+        {isCustomTrDate && (
+          <input type="date" className="memo-input" value={tr.date} max={localYMD(new Date())}
+            onChange={(e) => setTr({ ...tr, date: e.target.value })} style={{ marginTop: 8 }} />
+        )}
         <div className="field-lab">메모 (선택)</div>
         <input className="memo-input" placeholder="예: 이번 달 생활비 이체" value={tr.memo} onChange={(e) => setTr({ ...tr, memo: e.target.value })} />
         <Keypad onKey={pressKey} />
@@ -120,10 +130,13 @@ export default function InputSheet({ mode, preset, categories, member, onClose, 
   }
 
   // ---- 거래 폼 ----
-  const cats = draft.flow === '지출' ? categories.map((c) => c.name) : INC_CATS;
+  const cats = draft.flow === '지출'
+    ? categories.map((c) => c.name)
+    : (INC_CATS.includes(draft.cat) || !draft.cat ? INC_CATS : [...INC_CATS, draft.cat]);
   const isSalary = draft.cat === '급여';
   const showMethod = !isSalary;
   const methodOpts = ['카드', '현금', '계좌'];
+  const isCustomDate = /^\d{4}-\d{2}-\d{2}$/.test(draft.date);
 
   const setFlow = (flow) => {
     if (flow === '수입') setTx({ ...tx, flow, cat: '급여', who: 'husband', method: '계좌', whoAuto: false });
@@ -137,15 +150,16 @@ export default function InputSheet({ mode, preset, categories, member, onClose, 
   const save = () => {
     if (!amt) return notify('금액을 입력해주세요');
     if (!draft.cat) return notify('카테고리를 선택해주세요');
-    onSaveTx({
+    const payload = {
       flow: draft.flow === '지출' ? 'expense' : 'income',
-      amount: amt,
-      category: draft.cat,
-      owner: draft.who,
-      method: draft.method,
-      memo: draft.memo,
-      date: dateFromOpt(draft.date),
-    });
+      amount: amt, category: draft.cat, owner: draft.who, method: draft.method, memo: draft.memo,
+      // 수정: 원래 기록의 시각 보존(날짜만 교체). 신규: 칩/달력 → 현재 시각.
+      date: editTx && /^\d{4}-\d{2}-\d{2}$/.test(draft.date)
+        ? buildRecordDateISO(draft.date, editTx.date)
+        : resolveSheetDate(draft.date),
+    };
+    if (editTx) onUpdateTx({ id: editTx.id, ...payload });
+    else onSaveTx(payload);
   };
 
   return (
@@ -190,15 +204,22 @@ export default function InputSheet({ mode, preset, categories, member, onClose, 
       )}
 
       <div className="field-lab">날짜</div>
-      <div className="chips">{DATE_OPTS.map((d) => (
-        <button key={d} className={`chip ${draft.date === d ? 'on' : ''}`} onClick={() => setTx({ ...tx, date: d })}>{d}</button>
-      ))}</div>
+      <div className="chips">
+        {DATE_OPTS.map((d) => (
+          <button key={d} className={`chip ${draft.date === d ? 'on' : ''}`} onClick={() => setTx({ ...tx, date: d })}>{d}</button>
+        ))}
+        <button className={`chip ${isCustomDate ? 'on' : ''}`} onClick={() => setTx({ ...tx, date: localYMD(new Date()) })}>달력</button>
+      </div>
+      {isCustomDate && (
+        <input type="date" className="memo-input" value={draft.date} max={localYMD(new Date())}
+          onChange={(e) => setTx({ ...tx, date: e.target.value })} style={{ marginTop: 8 }} />
+      )}
 
       <div className="field-lab">메모 (선택)</div>
       <input className="memo-input" placeholder="예: 성수 카페 데이트" value={draft.memo} onChange={(e) => setTx({ ...tx, memo: e.target.value })} />
 
       <Keypad onKey={pressKey} />
-      <button className="save" onClick={save}>{draft.flow === '지출' ? '지출 저장' : isSalary ? '급여 저장' : '수입 저장'}</button>
+      <button className="save" onClick={save}>{editTx ? '수정 저장' : draft.flow === '지출' ? '지출 저장' : isSalary ? '급여 저장' : '수입 저장'}</button>
     </Shell>
   );
 }

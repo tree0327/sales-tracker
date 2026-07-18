@@ -12,6 +12,8 @@ import SettingsScreen from './screens/SettingsScreen';
 import TabBar from './components/TabBar';
 import InputSheet from './components/InputSheet';
 import MonthlyReport from './components/MonthlyReport';
+import ConfirmDialog from './components/ConfirmDialog';
+import SalesInputModal from './components/SalesInputModal';
 
 const MONTH_LABEL = (() => { const d = new Date(); return `${d.getFullYear()}년 ${d.getMonth() + 1}월`; })();
 
@@ -31,16 +33,22 @@ export default function Ledger({ user }) {
   const [reportClosed, setReportClosed] = useState(() => {
     try { return !!window.localStorage.getItem(reportKey); } catch { return true; }
   });
+  const [confirmLogout, setConfirmLogout] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(null); // 거래 id | null
+  const [undoTx, setUndoTx] = useState(null); // 삭제 직후 실행취소용 스냅샷
   const [expenseTab, setExpenseTab] = useState('고정');
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetMode, setSheetMode] = useState('tx');   // 'tx' | 'fixed'
   const [sheetPreset, setSheetPreset] = useState(null);
   const [openKey, setOpenKey] = useState(0);
+  const [editTx, setEditTx] = useState(null);         // 기록 탭 행 탭 → 수정 모드 대상 거래
+  const [salesEdit, setSalesEdit] = useState(null);    // 기록 탭에서 매출 행 수정 시(전용 모달)
 
   const [toast, setToast] = useState('');
   const toastTimer = useRef(null);
   const notify = useCallback((msg) => {
+    setUndoTx(null); // 새 알림이 뜨면 직전 삭제의 실행취소 기회는 닫는다(버튼이 엉뚱한 메시지에 붙는 것 방지)
     setToast(msg);
     clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setToast(''), 1700);
@@ -51,17 +59,24 @@ export default function Ledger({ user }) {
     setTab(view);
     window.scrollTo(0, 0);
   };
-  const openInput = (preset = null) => { setSheetMode('tx'); setSheetPreset(preset); setOpenKey((k) => k + 1); setSheetOpen(true); };
-  const openFixed = () => { setSheetMode('fixed'); setSheetPreset(null); setOpenKey((k) => k + 1); setSheetOpen(true); };
-  const openTransfer = () => { setSheetMode('transfer'); setSheetPreset(null); setOpenKey((k) => k + 1); setSheetOpen(true); };
+  const openInput = (preset = null) => { setSheetMode('tx'); setSheetPreset(preset); setEditTx(null); setOpenKey((k) => k + 1); setSheetOpen(true); };
+  const openFixed = () => { setSheetMode('fixed'); setSheetPreset(null); setEditTx(null); setOpenKey((k) => k + 1); setSheetOpen(true); };
+  const openTransfer = () => { setSheetMode('transfer'); setSheetPreset(null); setEditTx(null); setOpenKey((k) => k + 1); setSheetOpen(true); };
   const closeSheet = () => setSheetOpen(false);
+  // 기록 탭 행 탭 → 수정 진입. 매출은 수수료 로직이 있는 전용 모달로 라우팅.
+  const openEditTx = (t) => {
+    if (t.flow === 'income' && t.category === '매출') {
+      setSalesEdit({ id: t.id, original: t.amount, name: t.memo || '', date: t.date, type: t.method });
+      return;
+    }
+    setSheetMode('tx'); setSheetPreset(null); setEditTx(t); setOpenKey((k) => k + 1); setSheetOpen(true);
+  };
 
   const saveTx = async (payload) => {
     const row = await ledger.addTransaction(payload);
     closeSheet();
     if (row) {
       notify(`${payload.flow === 'expense' ? '지출' : payload.category === '급여' ? '급여' : '수입'} 저장!`);
-      setTab('home');
     }
   };
   const saveFixed = async (payload) => {
@@ -85,6 +100,29 @@ export default function Ledger({ user }) {
   const updateSales = async ({ id, method, amount, memo, date }) => {
     const row = await ledger.updateTransaction({ id, flow: 'income', category: '매출', method, amount, memo, date });
     if (row) notify('매출 수정!');
+  };
+  // 기록 탭 행 탭 → 수정 저장(지출·급여·기타수입). 매출은 openEditTx 에서 SalesInputModal 로 분기됨.
+  const updateTx = async (payload) => {
+    const row = await ledger.updateTransaction(payload);
+    closeSheet(); setEditTx(null);
+    if (row) notify('수정했어요');
+  };
+  const askDeleteTx = (id) => setConfirmDelete(id);
+  const doDeleteTx = async () => {
+    const id = confirmDelete;
+    setConfirmDelete(null);
+    const removed = await ledger.deleteTransaction(id);
+    if (removed) {
+      setUndoTx(removed);
+      clearTimeout(toastTimer.current);
+      setToast('삭제했어요');
+      toastTimer.current = setTimeout(() => { setToast(''); setUndoTx(null); }, 6000);
+    }
+  };
+  const undoDelete = async () => {
+    const t = undoTx;
+    setUndoTx(null); setToast('');
+    if (t) await ledger.addTransaction({ flow: t.flow, amount: t.amount, category: t.category, owner: t.owner, method: t.method, memo: t.memo, date: t.date });
   };
   const logout = () => supabase.auth.signOut();
 
@@ -134,20 +172,20 @@ export default function Ledger({ user }) {
       {error && <div className="status-banner error">문제가 발생했습니다: {error}</div>}
       {loading && <div className="status-banner info">동기화 중…</div>}
 
-      {tab === 'home' && <HomeScreen member={member} flow={flow} monthLabel={MONTH_LABEL} overallBudget={overallBudget} onNav={onNav} onLogout={logout} />}
+      {tab === 'home' && <HomeScreen member={member} flow={flow} monthLabel={MONTH_LABEL} overallBudget={overallBudget} jointBalance={jointStat.balance} onNav={onNav} onLogout={() => setConfirmLogout(true)} />}
       {tab === 'expense' && (
         <ExpenseScreen transactions={monthTx} fixed={fixed} activeTab={expenseTab} onTab={setExpenseTab}
           onNav={onNav} onAddFixed={openFixed} onDeleteFixed={ledger.deleteFixed}
           jointStat={jointStat} deposits={deposits} onDeposit={openTransfer} />
       )}
       {tab === 'sales' && (
-        <SalesScreen transactions={transactions} onAdd={addSales} onUpdate={updateSales} onDelete={ledger.deleteTransaction} />
+        <SalesScreen transactions={transactions} onAdd={addSales} onUpdate={updateSales} onDelete={askDeleteTx} />
       )}
       {tab === 'income' && <IncomeScreen transactions={monthTx} onAddIncome={openInput} />}
-      {tab === 'records' && <RecordsScreen transactions={transactions} budgets={bmap} onDelete={ledger.deleteTransaction} />}
+      {tab === 'records' && <RecordsScreen transactions={transactions} budgets={bmap} onDelete={askDeleteTx} onEdit={openEditTx} />}
       {tab === 'settings' && (
         <SettingsScreen categories={categories} budgets={bmap} member={member} onNav={onNav}
-          onSetBudget={ledger.setBudget} onAddCategory={ledger.addCategory} onDeleteCategory={ledger.deleteCategory} onLogout={logout} />
+          onSetBudget={ledger.setBudget} onAddCategory={ledger.addCategory} onDeleteCategory={ledger.deleteCategory} onLogout={() => setConfirmLogout(true)} />
       )}
 
       <TabBar tab={tab} onNav={onNav} onAdd={() => openInput(null)} />
@@ -155,10 +193,25 @@ export default function Ledger({ user }) {
       {report && <MonthlyReport report={report} onClose={closeReport} onSeeAnalysis={seeReportAnalysis} />}
 
       <InputSheet key={openKey} mode={sheetMode} preset={sheetPreset}
-        categories={categories} member={member} onClose={closeSheet}
-        onSaveTx={saveTx} onSaveFixed={saveFixed} onSaveTransfer={saveTransfer} notify={notify} />
+        categories={categories} member={member} editTx={editTx} onClose={closeSheet}
+        onSaveTx={saveTx} onUpdateTx={updateTx} onSaveFixed={saveFixed} onSaveTransfer={saveTransfer} notify={notify} />
 
-      <div className={`toast${toast ? ' show' : ''}`}>{toast}</div>
+      {salesEdit && (
+        <SalesInputModal key={`rec-edit-${salesEdit.id}`} isOpen type={salesEdit.type}
+          initialData={salesEdit} onClose={() => setSalesEdit(null)}
+          onSave={(type, amount, name, dateISO) => updateSales({ id: salesEdit.id, method: type, amount, memo: name, date: dateISO })} />
+      )}
+
+      <ConfirmDialog open={confirmLogout} title="로그아웃할까요?" confirmLabel="로그아웃"
+        onConfirm={() => { setConfirmLogout(false); logout(); }} onCancel={() => setConfirmLogout(false)} />
+
+      <ConfirmDialog open={confirmDelete !== null} title="기록을 삭제할까요?" body="삭제 직후 실행취소할 수 있어요."
+        confirmLabel="삭제" danger onConfirm={doDeleteTx} onCancel={() => setConfirmDelete(null)} />
+
+      <div className={`toast${toast ? ' show' : ''}`}>
+        {toast}
+        {undoTx && <button className="toast-undo" onClick={undoDelete}>실행취소</button>}
+      </div>
     </div>
   );
 }

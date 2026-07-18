@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase, TX_TABLE, FIXED_TABLE, CATEGORY_TABLE, BUDGET_TABLE } from '../supabaseClient';
 import { computeFinal, buildUpdatePatch } from '../utils/money';
+import { applyRealtimeEvent } from '../utils/realtimeMerge';
 
 // 부부 가계부 데이터 계층.
 // transactions / fixed_expenses / expense_categories 를 로드하고 추가·삭제한다.
@@ -44,6 +45,24 @@ export function useLedger() {
     reload();
   }, [reload]);
 
+  // 배우자 기기의 입력·수정·삭제를 실시간 반영. 자기 발신 이벤트는 id 멱등 병합이라 안전.
+  // 마운트 1회만 구독하고(빈 deps) cleanup 에서 반드시 채널을 제거해 리렌더마다 누적되지 않게 한다.
+  // Supabase 프로젝트에서 supabase/migrations/0010_realtime.sql 을 실행하지 않으면
+  // 이 채널은 그냥 아무 이벤트도 받지 못한 채 조용히 대기한다(앱은 기존처럼 정상 동작).
+  useEffect(() => {
+    const ch = supabase.channel('ledger-sync')
+      .on('postgres_changes', { event: '*', schema: 'public', table: TX_TABLE },
+        (e) => setTransactions((prev) => applyRealtimeEvent(prev, e, { sortByDateDesc: true })))
+      .on('postgres_changes', { event: '*', schema: 'public', table: FIXED_TABLE },
+        (e) => setFixed((prev) => applyRealtimeEvent(prev, e).sort((a, b) => b.amount - a.amount))) // applyRealtimeEvent는 항상 새 배열을 반환하므로 바로 정렬해도 원본 오염이 없다.
+      .on('postgres_changes', { event: '*', schema: 'public', table: CATEGORY_TABLE },
+        (e) => setCategories((prev) => applyRealtimeEvent(prev, e).sort((a, b) => (a.sort || 0) - (b.sort || 0))))
+      .on('postgres_changes', { event: '*', schema: 'public', table: BUDGET_TABLE },
+        (e) => setBudgets((prev) => applyRealtimeEvent(prev, e)))
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, []);
+
   // --- 거래 추가 ---
   const addTransaction = useCallback(async ({ flow, amount, category, owner, method, memo, date }) => {
     const payload = {
@@ -59,12 +78,13 @@ export function useLedger() {
     const { data, error: e } = await supabase.from(TX_TABLE).insert(payload).select().single();
     if (e) { setError(e.message); return null; }
     setError(null);
-    setTransactions((prev) => [data, ...prev]);
+    // realtime 이벤트가 먼저 도착했을 수 있어 id 멱등 가드
+    setTransactions((prev) => (prev.some((t) => t.id === data.id) ? prev : [data, ...prev]));
     return data;
   }, []);
 
-  const updateTransaction = useCallback(async ({ id, flow, category, method, amount, memo, date }) => {
-    const patch = buildUpdatePatch({ flow, category, method, amount, memo, date });
+  const updateTransaction = useCallback(async ({ id, flow, category, method, amount, memo, date, owner }) => {
+    const patch = buildUpdatePatch({ flow, category, method, amount, memo, date, owner });
     const snap = transactions;
     // 낙관적 갱신 후 실패하면 스냅샷으로 되돌린다(deleteTransaction 과 동일한 패턴).
     setTransactions((prev) => prev.map((t) => (t.id === id ? { ...t, ...patch } : t)));
@@ -77,9 +97,11 @@ export function useLedger() {
 
   const deleteTransaction = useCallback(async (id) => {
     const snap = transactions;
+    const removed = snap.find((t) => t.id === id) || null;
     setTransactions((prev) => prev.filter((t) => t.id !== id));
     const { error: e } = await supabase.from(TX_TABLE).delete().eq('id', id);
-    if (e) { setError(e.message); setTransactions(snap); }
+    if (e) { setError(e.message); setTransactions(snap); return null; }
+    return removed; // 실행취소용 스냅샷
   }, [transactions]);
 
   // --- 고정지출 ---
@@ -88,7 +110,8 @@ export function useLedger() {
     const { data, error: e } = await supabase.from(FIXED_TABLE).insert(payload).select().single();
     if (e) { setError(e.message); return null; }
     setError(null);
-    setFixed((prev) => [...prev, data].sort((a, b) => b.amount - a.amount));
+    // realtime 이벤트가 먼저 도착했을 수 있어 id 멱등 가드
+    setFixed((prev) => (prev.some((f) => f.id === data.id) ? prev : [...prev, data].sort((a, b) => b.amount - a.amount)));
     return data;
   }, []);
 
@@ -106,7 +129,8 @@ export function useLedger() {
     const sort = (categories.reduce((m, c) => Math.max(m, c.sort || 0), 0) || 0) + 1;
     const { data, error: e } = await supabase.from(CATEGORY_TABLE).insert({ name: trimmed, sort }).select().single();
     if (e) { setError(e.message); return null; }
-    setCategories((prev) => [...prev, data]);
+    // realtime 이벤트가 먼저 도착했을 수 있어 id 멱등 가드
+    setCategories((prev) => (prev.some((c) => c.id === data.id) ? prev : [...prev, data]));
     return data;
   }, [categories]);
 
