@@ -48,7 +48,7 @@ body { color: var(--fg); font-family: var(--font); -webkit-font-smoothing: antia
 button, input { font-family: inherit; }
 .num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
 
-.app { max-width: var(--maxw); margin: 0 auto; min-height: 100vh; position: relative; background: var(--paper); padding-bottom: 84px; }
+.app { max-width: var(--maxw); margin: 0 auto; min-height: 100vh; position: relative; background: var(--paper); padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
 
 .app-head { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; padding: 16px 16px 12px; background: linear-gradient(var(--paper) 72%, transparent); }
 .app-head .title { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 26px; letter-spacing: -.02em; cursor: pointer; background: none; border: none; color: var(--fg); }
@@ -162,7 +162,7 @@ button, input { font-family: inherit; }
 .setup p { color: var(--fg-2); font-size: 14px; line-height: 1.7; }
 .setup code { background: var(--fill); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 4px 8px; font-size: 12px; }
 
-.tabbar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: var(--maxw); height: 64px; background: color-mix(in srgb, var(--paper) 94%, transparent); backdrop-filter: blur(10px); border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-around; padding: 0 8px 4px; z-index: 20; }
+.tabbar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: var(--maxw); height: calc(64px + env(safe-area-inset-bottom)); background: color-mix(in srgb, var(--paper) 94%, transparent); backdrop-filter: blur(10px); border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-around; padding: 0 8px calc(4px + env(safe-area-inset-bottom)); z-index: 20; }
 .tabbar .tb { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; color: var(--fg-3); flex: 1; cursor: pointer; background: none; border: none; min-height: 48px; }
 .tabbar .tb.active { color: var(--accent); }
 .tabbar .tb i { font-style: normal; font-size: 17px; line-height: 1; }

@@ -49,7 +49,7 @@ export default function HomeScreen({ member, flow, monthLabel, overallBudget, on
   return (
     <div>
       <header className="app-head">
-        <span className="title">{monthLabel}<span className="chev">▾</span></span>
+        <button className="title" onClick={() => onNav('records')} aria-label="지난달 보기 — 기록으로 이동">{monthLabel}<span className="chev">▾</span></button>
         <span className="hd-r">
           <button className="icn" onClick={() => onNav('settings')}>⚙</button>
           <button className={`userchip ${member.cls}`} onClick={onLogout} title="탭하면 로그아웃">
