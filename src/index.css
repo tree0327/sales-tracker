@@ -244,6 +244,7 @@ button, input { font-family: inherit; }
 .btn-primary { border: none; background: var(--accent); color: var(--on-accent); }
 .btn-primary:hover { background: rgba(23,23,23,.8); }
 .btn-primary:disabled { opacity: .6; cursor: not-allowed; }
+.btn-primary.btn-danger { background: var(--err-fg); }
 
 /* 매출 기록 목록 모달 (SalesRecordModal) */
 .modal-sub { display: block; margin-top: 4px; font-size: 12px; font-weight: 400; color: var(--fg-2); }

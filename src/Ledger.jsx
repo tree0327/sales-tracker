@@ -12,6 +12,7 @@ import SettingsScreen from './screens/SettingsScreen';
 import TabBar from './components/TabBar';
 import InputSheet from './components/InputSheet';
 import MonthlyReport from './components/MonthlyReport';
+import ConfirmDialog from './components/ConfirmDialog';
 
 const MONTH_LABEL = (() => { const d = new Date(); return `${d.getFullYear()}년 ${d.getMonth() + 1}월`; })();
 
@@ -31,6 +32,7 @@ export default function Ledger({ user }) {
   const [reportClosed, setReportClosed] = useState(() => {
     try { return !!window.localStorage.getItem(reportKey); } catch { return true; }
   });
+  const [confirmLogout, setConfirmLogout] = useState(false);
   const [expenseTab, setExpenseTab] = useState('고정');
 
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -134,7 +136,7 @@ export default function Ledger({ user }) {
       {error && <div className="status-banner error">문제가 발생했습니다: {error}</div>}
       {loading && <div className="status-banner info">동기화 중…</div>}
 
-      {tab === 'home' && <HomeScreen member={member} flow={flow} monthLabel={MONTH_LABEL} overallBudget={overallBudget} onNav={onNav} onLogout={logout} />}
+      {tab === 'home' && <HomeScreen member={member} flow={flow} monthLabel={MONTH_LABEL} overallBudget={overallBudget} onNav={onNav} onLogout={() => setConfirmLogout(true)} />}
       {tab === 'expense' && (
         <ExpenseScreen transactions={monthTx} fixed={fixed} activeTab={expenseTab} onTab={setExpenseTab}
           onNav={onNav} onAddFixed={openFixed} onDeleteFixed={ledger.deleteFixed}
@@ -147,7 +149,7 @@ export default function Ledger({ user }) {
       {tab === 'records' && <RecordsScreen transactions={transactions} budgets={bmap} onDelete={ledger.deleteTransaction} />}
       {tab === 'settings' && (
         <SettingsScreen categories={categories} budgets={bmap} member={member} onNav={onNav}
-          onSetBudget={ledger.setBudget} onAddCategory={ledger.addCategory} onDeleteCategory={ledger.deleteCategory} onLogout={logout} />
+          onSetBudget={ledger.setBudget} onAddCategory={ledger.addCategory} onDeleteCategory={ledger.deleteCategory} onLogout={() => setConfirmLogout(true)} />
       )}
 
       <TabBar tab={tab} onNav={onNav} onAdd={() => openInput(null)} />
@@ -157,6 +159,9 @@ export default function Ledger({ user }) {
       <InputSheet key={openKey} mode={sheetMode} preset={sheetPreset}
         categories={categories} member={member} onClose={closeSheet}
         onSaveTx={saveTx} onSaveFixed={saveFixed} onSaveTransfer={saveTransfer} notify={notify} />
+
+      <ConfirmDialog open={confirmLogout} title="로그아웃할까요?" confirmLabel="로그아웃"
+        onConfirm={() => { setConfirmLogout(false); logout(); }} onCancel={() => setConfirmLogout(false)} />
 
       <div className={`toast${toast ? ' show' : ''}`}>{toast}</div>
     </div>
