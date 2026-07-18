@@ -152,7 +152,7 @@ button, input { font-family: inherit; }
 .catlist .cchip { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; padding: 8px 8px 8px 12px; border-radius: 999px; background: var(--fill); border: 1px solid var(--line); color: var(--fg); }
 .catlist .cchip .x { width: 18px; height: 18px; border-radius: 50%; background: var(--err-bg); color: var(--err-fg); display: grid; place-items: center; font-size: 12px; cursor: pointer; font-weight: 700; border: none; }
 .addcat { display: flex; gap: 8px; margin-top: 12px; }
-.addcat input { flex: 1; border: 1px solid var(--line); background: var(--fill); border-radius: var(--r-md); padding: 12px; font-size: 14px; color: var(--fg); }
+.addcat input { flex: 1; border: 1px solid var(--line); background: var(--fill); border-radius: var(--r-md); padding: 12px; font-size: 16px; color: var(--fg); }
 .addcat button { border: none; background: var(--accent); color: var(--on-accent); font-weight: 700; font-size: 13px; padding: 0 20px; border-radius: var(--r-md); cursor: pointer; }
 .set-logout { width: 100%; margin-top: 4px; padding: 16px; border-radius: var(--r-md); border: none; background: var(--bg); color: var(--err-fg); font-weight: 700; font-size: 14px; cursor: pointer; }
 
@@ -176,7 +176,7 @@ button, input { font-family: inherit; }
 .login .lead { text-align: center; color: var(--fg-2); font-size: 13px; margin: 0 0 28px; }
 .lfield { margin-bottom: 12px; }
 .lfield label { font-size: 12px; font-weight: 700; color: var(--fg-2); display: block; margin: 0 4px 8px; }
-.lfield input { width: 100%; border: 1px solid var(--line); background: var(--bg); border-radius: var(--r-md); padding: 16px; font-size: 15px; color: var(--fg); }
+.lfield input { width: 100%; border: 1px solid var(--line); background: var(--bg); border-radius: var(--r-md); padding: 16px; font-size: 16px; color: var(--fg); }
 .login .primary { margin-top: 8px; width: 100%; padding: 16px; border-radius: var(--r-lg); background: var(--accent); color: var(--on-accent); font-size: 15px; font-weight: 700; border: none; cursor: pointer; min-height: 56px; }
 .login .primary:disabled { opacity: .6; }
 .login .lmsg { text-align: center; font-size: 12px; margin-top: 12px; font-weight: 500; }
@@ -205,13 +205,13 @@ button, input { font-family: inherit; }
 .who { display: flex; gap: 8px; }
 .who .w2 { flex: 1; text-align: center; padding: 12px; border-radius: var(--r-md); font-size: 13px; font-weight: 700; border: 1.5px solid var(--line); background: var(--fill); color: var(--fg-2); cursor: pointer; }
 .who .w2.on { border-color: var(--fg); background: var(--fill); color: var(--fg); }
-.memo-input { width: 100%; border: 1px solid var(--line); background: var(--fill); border-radius: var(--r-md); padding: 12px 16px; font-size: 14px; color: var(--fg); }
+.memo-input { width: 100%; border: 1px solid var(--line); background: var(--fill); border-radius: var(--r-md); padding: 12px 16px; font-size: 16px; color: var(--fg); }
 .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 16px; }
 .key { text-align: center; padding: 16px; font-size: 20px; font-weight: 700; border-radius: var(--r-md); background: var(--fill); border: none; cursor: pointer; user-select: none; color: var(--fg); }
 .key:active { background: var(--fill); }
 .save { margin-top: 16px; width: 100%; padding: 16px; border-radius: var(--r-lg); background: var(--accent); color: var(--on-accent); font-size: 15px; font-weight: 700; text-align: center; cursor: pointer; border: none; min-height: 56px; }
 
-.toast { position: fixed; left: 50%; bottom: 84px; transform: translate(-50%, 20px); background: var(--fg); color: var(--bg); font-size: 13px; font-weight: 700; padding: 12px 20px; border-radius: 999px; opacity: 0; pointer-events: none; transition: all .25s; z-index: 60; white-space: nowrap; }
+.toast { position: fixed; left: 50%; bottom: calc(84px + env(safe-area-inset-bottom)); transform: translate(-50%, 20px); background: var(--fg); color: var(--bg); font-size: 13px; font-weight: 700; padding: 12px 20px; border-radius: 999px; opacity: 0; pointer-events: none; transition: all .25s; z-index: 60; white-space: nowrap; }
 .toast.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
 /* 토스트 배경이 --fg(#171717, 어두움)라 밝은 파랑 유지 — #171717 위 #7CC0FF 대비 9.26:1 (AA 4.5:1 충족). */
 .toast-undo { margin-left: 12px; background: none; border: none; color: #7CC0FF; font-weight: 700; font-size: 13px; cursor: pointer; }

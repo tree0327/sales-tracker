@@ -78,7 +78,8 @@ export function useLedger() {
     const { data, error: e } = await supabase.from(TX_TABLE).insert(payload).select().single();
     if (e) { setError(e.message); return null; }
     setError(null);
-    setTransactions((prev) => [data, ...prev]);
+    // realtime 이벤트가 먼저 도착했을 수 있어 id 멱등 가드
+    setTransactions((prev) => (prev.some((t) => t.id === data.id) ? prev : [data, ...prev]));
     return data;
   }, []);
 
@@ -109,7 +110,8 @@ export function useLedger() {
     const { data, error: e } = await supabase.from(FIXED_TABLE).insert(payload).select().single();
     if (e) { setError(e.message); return null; }
     setError(null);
-    setFixed((prev) => [...prev, data].sort((a, b) => b.amount - a.amount));
+    // realtime 이벤트가 먼저 도착했을 수 있어 id 멱등 가드
+    setFixed((prev) => (prev.some((f) => f.id === data.id) ? prev : [...prev, data].sort((a, b) => b.amount - a.amount)));
     return data;
   }, []);
 
@@ -127,7 +129,8 @@ export function useLedger() {
     const sort = (categories.reduce((m, c) => Math.max(m, c.sort || 0), 0) || 0) + 1;
     const { data, error: e } = await supabase.from(CATEGORY_TABLE).insert({ name: trimmed, sort }).select().single();
     if (e) { setError(e.message); return null; }
-    setCategories((prev) => [...prev, data]);
+    // realtime 이벤트가 먼저 도착했을 수 있어 id 멱등 가드
+    setCategories((prev) => (prev.some((c) => c.id === data.id) ? prev : [...prev, data]));
     return data;
   }, [categories]);
 

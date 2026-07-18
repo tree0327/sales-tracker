@@ -32,6 +32,8 @@ export function computeFinal({ flow, category, method, amount }) {
 // — final 재계산과 급여→계좌 강제 둘 다. 어긋나면 추가와 수정의 결과가 갈린다.
 export function buildUpdatePatch({ flow, category, method, amount, memo, date, owner }) {
   const patch = {
+    // 수정 시트가 카테고리·유형(flow)을 바꿀 수 있으므로 patch 에 포함
+    flow, category,
     amount: Number(amount) || 0,
     final: computeFinal({ flow, category, method, amount }),
     method: flow === 'income' && category === '급여' ? '계좌' : method,
