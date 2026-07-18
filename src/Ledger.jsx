@@ -33,6 +33,8 @@ export default function Ledger({ user }) {
     try { return !!window.localStorage.getItem(reportKey); } catch { return true; }
   });
   const [confirmLogout, setConfirmLogout] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(null); // 거래 id | null
+  const [undoTx, setUndoTx] = useState(null); // 삭제 직후 실행취소용 스냅샷
   const [expenseTab, setExpenseTab] = useState('고정');
 
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -87,6 +89,23 @@ export default function Ledger({ user }) {
   const updateSales = async ({ id, method, amount, memo, date }) => {
     const row = await ledger.updateTransaction({ id, flow: 'income', category: '매출', method, amount, memo, date });
     if (row) notify('매출 수정!');
+  };
+  const askDeleteTx = (id) => setConfirmDelete(id);
+  const doDeleteTx = async () => {
+    const id = confirmDelete;
+    setConfirmDelete(null);
+    const removed = await ledger.deleteTransaction(id);
+    if (removed) {
+      setUndoTx(removed);
+      clearTimeout(toastTimer.current);
+      setToast('삭제했어요');
+      toastTimer.current = setTimeout(() => { setToast(''); setUndoTx(null); }, 6000);
+    }
+  };
+  const undoDelete = async () => {
+    const t = undoTx;
+    setUndoTx(null); setToast('');
+    if (t) await ledger.addTransaction({ flow: t.flow, amount: t.amount, category: t.category, owner: t.owner, method: t.method, memo: t.memo, date: t.date });
   };
   const logout = () => supabase.auth.signOut();
 
@@ -143,10 +162,10 @@ export default function Ledger({ user }) {
           jointStat={jointStat} deposits={deposits} onDeposit={openTransfer} />
       )}
       {tab === 'sales' && (
-        <SalesScreen transactions={transactions} onAdd={addSales} onUpdate={updateSales} onDelete={ledger.deleteTransaction} />
+        <SalesScreen transactions={transactions} onAdd={addSales} onUpdate={updateSales} onDelete={askDeleteTx} />
       )}
       {tab === 'income' && <IncomeScreen transactions={monthTx} onAddIncome={openInput} />}
-      {tab === 'records' && <RecordsScreen transactions={transactions} budgets={bmap} onDelete={ledger.deleteTransaction} />}
+      {tab === 'records' && <RecordsScreen transactions={transactions} budgets={bmap} onDelete={askDeleteTx} />}
       {tab === 'settings' && (
         <SettingsScreen categories={categories} budgets={bmap} member={member} onNav={onNav}
           onSetBudget={ledger.setBudget} onAddCategory={ledger.addCategory} onDeleteCategory={ledger.deleteCategory} onLogout={() => setConfirmLogout(true)} />
@@ -163,7 +182,13 @@ export default function Ledger({ user }) {
       <ConfirmDialog open={confirmLogout} title="로그아웃할까요?" confirmLabel="로그아웃"
         onConfirm={() => { setConfirmLogout(false); logout(); }} onCancel={() => setConfirmLogout(false)} />
 
-      <div className={`toast${toast ? ' show' : ''}`}>{toast}</div>
+      <ConfirmDialog open={confirmDelete !== null} title="기록을 삭제할까요?" body="삭제 직후 실행취소할 수 있어요."
+        confirmLabel="삭제" danger onConfirm={doDeleteTx} onCancel={() => setConfirmDelete(null)} />
+
+      <div className={`toast${toast ? ' show' : ''}`}>
+        {toast}
+        {undoTx && <button className="toast-undo" onClick={undoDelete}>실행취소</button>}
+      </div>
     </div>
   );
 }

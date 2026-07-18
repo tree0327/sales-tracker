@@ -21,7 +21,7 @@ function FilterChips({ value, onChange }) {
   );
 }
 
-function RecRow({ r, onEdit, onAskDelete }) {
+function RecRow({ r, onEdit, onDelete }) {
   return (
     <li className="rec-item">
       <div className="rec-main">
@@ -38,7 +38,7 @@ function RecRow({ r, onEdit, onAskDelete }) {
       </div>
       <div className="rec-actions">
         <button className="btn-mini" onClick={() => onEdit(r)}>수정</button>
-        <button className="btn-mini danger" onClick={() => onAskDelete(r.id)}>삭제</button>
+        <button className="btn-mini danger" onClick={() => onDelete(r.id)}>삭제</button>
       </div>
     </li>
   );
@@ -48,7 +48,6 @@ function RecRow({ r, onEdit, onAskDelete }) {
 // current: 이번 달 목록 + 전체/현금/카드 필터. 헤더 건수·합계도 필터를 따라간다.
 // all: 월별 아코디언(월 합계 + 현금/카드 소계) → 펼치면 그 달 전용 필터 + 거래 목록.
 export default function SalesRecordModal({ isOpen, records, viewType, onClose, onEdit, onDelete }) {
-  const [confirmId, setConfirmId] = useState(null);
   const [curFilter, setCurFilter] = useState('전체');
   const [openMonths, setOpenMonths] = useState({});     // { '2026-07': true }
   const [monthFilters, setMonthFilters] = useState({}); // { '2026-07': '카드' }
@@ -73,7 +72,7 @@ export default function SalesRecordModal({ isOpen, records, viewType, onClose, o
         <FilterChips value={curFilter} onChange={setCurFilter} />
         {list.length === 0 && <p className="empty">해당 기록이 없어요.</p>}
         <ul className="rec-list">
-          {list.map((r) => <RecRow key={r.id} r={r} onEdit={onEdit} onAskDelete={setConfirmId} />)}
+          {list.map((r) => <RecRow key={r.id} r={r} onEdit={onEdit} onDelete={onDelete} />)}
         </ul>
       </>
     );
@@ -101,7 +100,7 @@ export default function SalesRecordModal({ isOpen, records, viewType, onClose, o
               <FilterChips value={f} onChange={(v) => setMonthFilter(g.key, v)} />
               {list.length === 0 && <p className="empty">해당 결제수단 기록이 없어요.</p>}
               <ul className="rec-list">
-                {list.map((r) => <RecRow key={r.id} r={r} onEdit={onEdit} onAskDelete={setConfirmId} />)}
+                {list.map((r) => <RecRow key={r.id} r={r} onEdit={onEdit} onDelete={onDelete} />)}
               </ul>
             </div>
           )}
@@ -124,20 +123,6 @@ export default function SalesRecordModal({ isOpen, records, viewType, onClose, o
         <div className="modal-actions">
           <button className="btn-ghost" onClick={onClose}>닫기</button>
         </div>
-
-        {confirmId !== null && (
-          <div className="modal-scrim" onClick={() => setConfirmId(null)}>
-            <div className="modal-card" role="dialog" aria-modal="true" aria-labelledby="del-title"
-              onClick={(e) => e.stopPropagation()}>
-              <h2 id="del-title" className="modal-title">기록을 삭제할까요?</h2>
-              <p className="modal-body">되돌릴 수 없습니다.</p>
-              <div className="modal-actions">
-                <button className="btn-ghost" onClick={() => setConfirmId(null)}>취소</button>
-                <button className="btn-primary" onClick={() => { onDelete(confirmId); setConfirmId(null); }}>삭제</button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>,
     document.body

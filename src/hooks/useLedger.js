@@ -77,9 +77,11 @@ export function useLedger() {
 
   const deleteTransaction = useCallback(async (id) => {
     const snap = transactions;
+    const removed = snap.find((t) => t.id === id) || null;
     setTransactions((prev) => prev.filter((t) => t.id !== id));
     const { error: e } = await supabase.from(TX_TABLE).delete().eq('id', id);
-    if (e) { setError(e.message); setTransactions(snap); }
+    if (e) { setError(e.message); setTransactions(snap); return null; }
+    return removed; // 실행취소용 스냅샷
   }, [transactions]);
 
   // --- 고정지출 ---

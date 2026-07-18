@@ -210,7 +210,9 @@ button, input { font-family: inherit; }
 .save { margin-top: 16px; width: 100%; padding: 16px; border-radius: var(--r-lg); background: var(--accent); color: var(--on-accent); font-size: 15px; font-weight: 700; text-align: center; cursor: pointer; border: none; min-height: 56px; }
 
 .toast { position: fixed; left: 50%; bottom: 84px; transform: translate(-50%, 20px); background: var(--fg); color: var(--bg); font-size: 13px; font-weight: 700; padding: 12px 20px; border-radius: 999px; opacity: 0; pointer-events: none; transition: all .25s; z-index: 60; white-space: nowrap; }
-.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.toast.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+/* 토스트 배경이 --fg(#171717, 어두움)라 밝은 파랑 유지 — #171717 위 #7CC0FF 대비 9.26:1 (AA 4.5:1 충족). */
+.toast-undo { margin-left: 12px; background: none; border: none; color: #7CC0FF; font-weight: 700; font-size: 13px; cursor: pointer; }
 
 /* month-end report modal */
 .modal-scrim { position: fixed; inset: 0; background: rgba(0, 0, 0, .5); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 24px; }
