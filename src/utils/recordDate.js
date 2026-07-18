@@ -15,3 +15,13 @@ export function localYMD(dateLike) {
   const d = dateLike instanceof Date ? dateLike : new Date(dateLike);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
+
+// 입력 시트의 날짜 선택('오늘'/'어제'/'그저께' 칩 또는 달력 YYYY-MM-DD)을 ISO 로.
+// 시각은 항상 now 의 시:분:초 — 예전 '정오 12시 고정' 버그를 대체한다.
+export function resolveSheetDate(opt, now = new Date()) {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(opt)) return buildRecordDateISO(opt, null, now);
+  const d = new Date(now);
+  if (opt === '어제') d.setDate(d.getDate() - 1);
+  if (opt === '그저께') d.setDate(d.getDate() - 2);
+  return buildRecordDateISO(localYMD(d), null, now);
+}
