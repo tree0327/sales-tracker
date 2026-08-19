@@ -1,4 +1,4 @@
-// 금액 포매팅 + 카드 수수료 계산.
+// 금액 포매팅 + 매출 반영액 계산.
 
 // 천단위 콤마 + 음수는 유니코드 마이너스(−)로. 0원도 '0'.
 export function fmt(n) {
@@ -12,20 +12,10 @@ export function fmtSigned(n) {
   return (v >= 0 ? '+' : '−') + Math.abs(v).toLocaleString('en-US');
 }
 
-export const CARD_FEE_RATE = 0.1;
-
-// 매출 카드결제 실수령 = floor(원금 × 0.9). 정수연산으로 DB와 일치.
-export function cardFinal(original) {
-  const n = Number(original) || 0;
-  return Math.floor((n * 900) / 1000);
-}
-
-// 거래 1건의 매출 반영액(final) 계산.
-// 매출 + 카드 → 수수료 10% 차감, 그 외 → 원금 그대로.
-export function computeFinal({ flow, category, method, amount }) {
-  const n = Number(amount) || 0;
-  if (flow === 'income' && category === '매출' && method === '카드') return cardFinal(n);
-  return n;
+// 거래 1건의 매출 반영액(final) 계산. 결제수단과 무관하게 원금 그대로 —
+// 카드 수수료 차감은 폐지됐다. final 컬럼은 기존 데이터·집계 호환을 위해 유지한다.
+export function computeFinal({ amount }) {
+  return Number(amount) || 0;
 }
 
 // 거래 수정 시 DB에 보낼 패치. addTransaction 의 payload 규칙과 동일해야 한다
@@ -35,7 +25,7 @@ export function buildUpdatePatch({ flow, category, method, amount, memo, date, o
     // 수정 시트가 카테고리·유형(flow)을 바꿀 수 있으므로 patch 에 포함
     flow, category,
     amount: Number(amount) || 0,
-    final: computeFinal({ flow, category, method, amount }),
+    final: computeFinal({ amount }),
     method: flow === 'income' && category === '급여' ? '계좌' : method,
     memo: (memo || '').trim(),
     date,

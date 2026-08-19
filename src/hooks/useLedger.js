@@ -156,7 +156,8 @@ export function useLedger() {
 
   return {
     transactions, fixed, categories, budgets, loading, error, needsSetup,
-    reload, addTransaction, updateTransaction, deleteTransaction, addFixed, deleteFixed, addCategory, deleteCategory, setBudget,
+    reload, addTransaction, updateTransaction, deleteTransaction, addFixed, deleteFixed,
+    addCategory, deleteCategory, setBudget,
   };
 }
 

@@ -2,9 +2,11 @@ import { useState, useRef, useCallback } from 'react';
 import { supabase } from './supabaseClient';
 import { resolveMember } from './lib/members';
 import { useLedger } from './hooks/useLedger';
+import { fmt as fmtWon } from './utils/money';
 import { monthlyFlow, isSameMonth, budgetMap, OVERALL, byCategory, sumFinal, sumAmount, incomeList, expenseList, jointBalance, jointContributions, jointDeposits } from './utils/ledger';
 import HomeScreen from './screens/HomeScreen';
 import ExpenseScreen from './screens/ExpenseScreen';
+import CalendarScreen from './screens/CalendarScreen';
 import SalesScreen from './screens/SalesScreen';
 import IncomeScreen from './screens/IncomeScreen';
 import RecordsScreen from './screens/RecordsScreen';
@@ -108,9 +110,8 @@ export default function Ledger({ user }) {
     if (row) notify('수정했어요');
   };
   const askDeleteTx = (id) => setConfirmDelete(id);
-  const doDeleteTx = async () => {
-    const id = confirmDelete;
-    setConfirmDelete(null);
+  // 실제 삭제 + 실행취소 토스트. 확인 다이얼로그를 거친 경로와 캘린더 팝업이 같이 쓴다.
+  const deleteTxNow = async (id) => {
     const removed = await ledger.deleteTransaction(id);
     if (removed) {
       setUndoTx(removed);
@@ -118,6 +119,18 @@ export default function Ledger({ user }) {
       setToast('삭제했어요');
       toastTimer.current = setTimeout(() => { setToast(''); setUndoTx(null); }, 6000);
     }
+  };
+  const doDeleteTx = async () => {
+    const id = confirmDelete;
+    setConfirmDelete(null);
+    await deleteTxNow(id);
+  };
+  // 캘린더에서 누른 날짜로 지출 저장. 소유자는 로그인한 사람, 결제수단은 카드 기본.
+  const addCalendarExpense = async ({ amount, category, memo, date }) => {
+    const row = await ledger.addTransaction({
+      flow: 'expense', amount, category, owner: member.role, method: '카드', memo, date,
+    });
+    if (row) notify(`${fmtWon(amount)}원 저장!`);
   };
   const undoDelete = async () => {
     const t = undoTx;
@@ -172,7 +185,11 @@ export default function Ledger({ user }) {
       {error && <div className="status-banner error">문제가 발생했습니다: {error}</div>}
       {loading && <div className="status-banner info">동기화 중…</div>}
 
-      {tab === 'home' && <HomeScreen member={member} flow={flow} monthLabel={MONTH_LABEL} overallBudget={overallBudget} jointBalance={jointStat.balance} onNav={onNav} onLogout={() => setConfirmLogout(true)} />}
+      {tab === 'home' && <HomeScreen member={member} flow={flow} monthLabel={MONTH_LABEL} overallBudget={overallBudget} onNav={onNav} onLogout={() => setConfirmLogout(true)} />}
+      {tab === 'calendar' && (
+        <CalendarScreen transactions={transactions} categories={categories}
+          onAddExpense={addCalendarExpense} onDeleteExpense={deleteTxNow} />
+      )}
       {tab === 'expense' && (
         <ExpenseScreen transactions={monthTx} fixed={fixed} activeTab={expenseTab} onTab={setExpenseTab}
           onNav={onNav} onAddFixed={openFixed} onDeleteFixed={ledger.deleteFixed}

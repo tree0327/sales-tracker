@@ -11,7 +11,8 @@ function dayLabel(date) {
 export default function TxRow({ tx, onDelete, onEdit, showCategory = true }) {
   const isIncome = tx.flow === 'income';
   const amount = isIncome ? (tx.final ?? tx.amount) : tx.amount;
-  const cardSalonNote = isIncome && tx.category === '매출' && tx.method === '카드' ? ` · 원금 ${fmt(tx.amount)}` : '';
+  // 수수료가 차감된 과거 매출 기록만 원금을 덧붙인다. 수수료 폐지 후 기록은 final === amount 라 표시하지 않는다.
+  const cardSalonNote = isIncome && tx.category === '매출' && Number(amount) !== Number(tx.amount) ? ` · 원금 ${fmt(tx.amount)}` : '';
   const title = tx.memo || tx.category;
 
   return (

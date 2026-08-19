@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { CARD_FEE_RATE, cardFinal } from '../utils/money';
 import { buildRecordDateISO, localYMD } from '../utils/recordDate';
 
 // 매출 입력/수정. 부모가 열 때마다 key 를 바꿔 리마운트하므로 초기값은 useState 초기화로 한 번만 계산한다.
@@ -51,13 +50,6 @@ export default function SalesInputModal({ isOpen, type, initialData, onClose, on
           <span className="field-label">금액 (필수)</span>
           <input type="text" inputMode="numeric" placeholder="0" value={display} onChange={onAmount} autoFocus />
         </label>
-
-        {type === '카드' && Number(amount) > 0 && (
-          <p className="field-hint">
-            수수료 {CARD_FEE_RATE * 100}% 차감 후 실수령{' '}
-            <b className="num">{cardFinal(Number(amount)).toLocaleString()}원</b>
-          </p>
-        )}
 
         {err && <p className="msg err" role="alert">{err}</p>}
 

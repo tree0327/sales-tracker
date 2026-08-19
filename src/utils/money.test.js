@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { fmt, fmtSigned, cardFinal, computeFinal, buildUpdatePatch } from './money';
+import { fmt, fmtSigned, computeFinal, buildUpdatePatch } from './money';
 
 describe('money', () => {
   it('fmt: 천단위 콤마 + 음수는 −', () => {
@@ -14,13 +14,8 @@ describe('money', () => {
     expect(fmtSigned(0)).toBe('+0');
   });
 
-  it('cardFinal: 원금의 90% (floor)', () => {
-    expect(cardFinal(100000)).toBe(90000);
-    expect(cardFinal(111)).toBe(99); // floor(99.9)
-  });
-
-  it('computeFinal: 매출+카드만 수수료 차감', () => {
-    expect(computeFinal({ flow: 'income', category: '매출', method: '카드', amount: 100000 })).toBe(90000);
+  it('computeFinal: 결제수단과 무관하게 원금 그대로 (카드 수수료 폐지)', () => {
+    expect(computeFinal({ flow: 'income', category: '매출', method: '카드', amount: 100000 })).toBe(100000);
     expect(computeFinal({ flow: 'income', category: '매출', method: '현금', amount: 100000 })).toBe(100000);
     expect(computeFinal({ flow: 'income', category: '급여', method: '계좌', amount: 3000000 })).toBe(3000000);
     expect(computeFinal({ flow: 'expense', category: '식비', method: '카드', amount: 12000 })).toBe(12000);
@@ -28,14 +23,14 @@ describe('money', () => {
 });
 
 describe('buildUpdatePatch', () => {
-  it('매출 카드는 수수료 10%를 뗀 final을 만든다', () => {
+  it('매출 카드도 원금 그대로 final 이 된다', () => {
     const patch = buildUpdatePatch({
       flow: 'income', category: '매출', method: '카드',
       amount: 100000, memo: ' 염색 ', date: '2026-07-16T03:00:00Z',
     });
     expect(patch).toEqual({
       flow: 'income', category: '매출',
-      amount: 100000, final: 90000, method: '카드',
+      amount: 100000, final: 100000, method: '카드',
       memo: '염색', date: '2026-07-16T03:00:00Z',
     });
   });
