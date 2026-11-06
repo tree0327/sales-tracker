@@ -1,6 +1,6 @@
 {
-  "short_name": "부부가계부",
-  "name": "부부 가계부",
+  "short_name": "다빈",
+  "name": "다빈",
   "icons": [
     {
       "src": "favicon-192.png",
@@ -11,11 +11,6 @@
       "src": "favicon.png",
       "type": "image/png",
       "sizes": "512x512"
-    },
-    {
-      "src": "favicon.svg",
-      "type": "image/svg+xml",
-      "sizes": "any"
     }
   ],
   "start_url": ".",
